@@ -1,9 +1,12 @@
 <div align="center">
   <!-- 🚀 ACTION REQUIRED: Save your UI preview image as `preview.png` inside the `assets` folder! -->
   <img src="assets/preview.png" alt="Odre Preview" width="800" />
+  <br/><br/>
+  <img src="assets/icon.png" alt="Odre Preview" width="128" />
   <br/>
-  <h1>Odre</h1>
-  <p><b>Make Folder Sexy Again</b></p>
+  <div align="center">
+    <span style="font-size: 2em; font-weight: bold;">Odre</span>
+  </div>
   <p>Windows 환경에서 지정한 폴더를 실시간으로 확인하고, 조건에 맞게 파일들을 자동 분류하는 미니멀리즘 데스크탑 앱.</p>
 
   <p>
