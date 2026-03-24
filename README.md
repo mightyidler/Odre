@@ -1,20 +1,22 @@
 <div align="center">
-  <!-- 🚀 ACTION REQUIRED: Save your UI preview image as `preview.png` inside the `assets` folder! -->
   <img src="assets/preview.png" alt="Odre Preview" width="800" />
   <br/><br/>
-  <img src="assets/icon.png" alt="Odre Preview" width="128" />
-  <br/>
-  <div align="center">
-    <span style="font-size: 2em; font-weight: bold;">Odre</span>
-  </div>
-  <p>Windows 환경에서 지정한 폴더를 실시간으로 확인하고, 조건에 맞게 파일들을 자동 분류하는 미니멀리즘 데스크탑 앱.</p>
-
-  <p>
-    <img src="https://img.shields.io/badge/Platform-Windows-0078D6?style=flat-square&logo=windows" alt="Windows" />
-    <img src="https://img.shields.io/badge/Built%20with-Tauri-FFC131?style=flat-square&logo=tauri&logoColor=white" alt="Tauri" />
-    <img src="https://img.shields.io/badge/Backend-Rust-000000?style=flat-square&logo=rust" alt="Rust" />
-    <a href="https://github.com/mightyidler/Odre/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" alt="License" /></a>
+  <img src="assets/icon.png" alt="Odre Icon" width="90" />
+  <p align="center">
+    <strong>"Odre"</strong><br />
+    복잡한 바탕화면과 다운로드 폴더를 정리하는 가장 완벽하고 가벼운 방법.
   </p>
+
+  <p align="center">
+    <img src="https://img.shields.io/badge/Platform-Windows-0078D6?style=flat-square&logo=windows&logoColor=white" />
+    <img src="https://img.shields.io/badge/Built%20with-Tauri-FFC131?style=flat-square&logo=tauri&logoColor=white" />
+    <img src="https://img.shields.io/badge/Backend-Rust-000000?style=flat-square&logo=rust&logoColor=white" />
+    <a href="https://github.com/mightyidler/Odre/blob/main/LICENSE">
+      <img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" />
+    </a>
+  </p>
+
+  <br />
 </div>
 
 ---
