@@ -155,10 +155,10 @@ window.addEventListener('scroll', handleScroll, { passive: true });
 
 const i18n = {
   '한국어': {
-    autoClean: '자동 정리', autoCleanDesc: '백그라운드에서 실시간으로 감시하며 폴더의 질서를 유지합니다.',
+    autoClean: '자동 정리', autoCleanDesc: '백그라운드에서 실시간으로 모니터링하며 폴더의 질서를 유지합니다.',
     cleanNow: '지금 정리하기', dissolve: '폴더 해체',
-    watchFolder: '감시 폴더', addFolder: '폴더 추가',
-    saveLocation: '저장 위치', sortInWatch: '감시 폴더 내 분류',
+    watchFolder: '모니터링 폴더', addFolder: '폴더 추가',
+    saveLocation: '저장 위치', sortInWatch: '모니터링 폴더 내 분류',
     sortInWatchDesc: '비활성화 시 모든 파일을 지정된 다른 폴더로 이동하여 분류합니다.',
     unset: '미설정', select: '선택',
     actionSettings: '동작 설정', moveDelay: '이동 지연', duplicate: '중복 파일',
@@ -179,8 +179,8 @@ const i18n = {
   'English': {
     autoClean: 'Auto-Organize', autoCleanDesc: 'Runs in the background and keeps your folders tidy in real time.',
     cleanNow: 'Organize Now', dissolve: 'Remove',
-    watchFolder: 'Watch Folders', addFolder: 'Add Folder',
-    saveLocation: 'Save Location', sortInWatch: 'Sort into Watch Folder',
+    watchFolder: 'Monitored Folders', addFolder: 'Add Folder',
+    saveLocation: 'Save Location', sortInWatch: 'Sort into Monitored Folder',
     sortInWatchDesc: 'When off, all files are moved to a separate designated folder.',
     unset: 'Not Set', select: 'Select',
     actionSettings: 'Behavior', moveDelay: 'Move Delay', duplicate: 'Duplicates',
@@ -199,10 +199,10 @@ const i18n = {
     theme: 'Theme', theme_system: 'System Default', theme_dark: 'Dark Mode', theme_light: 'Light Mode',
   },
   '中文': {
-    autoClean: '自动整理', autoCleanDesc: '在后台实时监控，自动保持文件夹井然有序。',
-    cleanNow: '立即整理', dissolve: '取消监控',
-    watchFolder: '监视文件夹', addFolder: '添加文件夹',
-    saveLocation: '保存位置', sortInWatch: '在监视文件夹内整理',
+    autoClean: '自动整理', autoCleanDesc: '在后台实时运行，自动保持文件夹井然有序。',
+    cleanNow: '立即整理', dissolve: '取消管理',
+    watchFolder: '管理文件夹', addFolder: '添加文件夹',
+    saveLocation: '保存位置', sortInWatch: '在管理文件夹内整理',
     sortInWatchDesc: '关闭后，所有文件将移动到指定的其他文件夹进行整理。',
     unset: '未设置', select: '选择',
     actionSettings: '操作设置', moveDelay: '移动延迟', duplicate: '重复文件',
@@ -221,10 +221,10 @@ const i18n = {
     theme: '主题', theme_system: '系统设置', theme_dark: '深色模式', theme_light: '浅色模式',
   },
   '日本語': {
-    autoClean: '자동 정리', autoClean: '自動整理', autoCleanDesc: 'バックグラウンドでリアルタイムに監視して、フォルダを常に整った状態に保ちます。',
-    cleanNow: '今すぐ整理', dissolve: '監視を解除',
-    watchFolder: '監視フォルダ', addFolder: 'フォルダを追加',
-    saveLocation: '保存先', sortInWatch: '監視フォルダ内で整理',
+    autoClean: '自動整理', autoCleanDesc: 'バックグラウンドでリアルタイムに確認して、フォルダを常に整った状態に保ちます。',
+    cleanNow: '今すぐ整理', dissolve: '管理を解除',
+    watchFolder: '対象フォルダ', addFolder: 'フォルダを追加',
+    saveLocation: '保存先', sortInWatch: '対象フォルダ内で整理',
     sortInWatchDesc: 'オフにすると、すべてのファイルを別の指定フォルダへ移動して整理します。',
     unset: '未設定', select: '選択',
     actionSettings: '動作設定', moveDelay: '移動の遅延', duplicate: '重複ファイル',
@@ -245,8 +245,8 @@ const i18n = {
   'Français': {
     autoClean: 'Organisation auto', autoCleanDesc: 'Surveille en arrière-plan et maintient vos dossiers organisés en temps réel.',
     cleanNow: 'Organiser maintenant', dissolve: 'Supprimer',
-    watchFolder: 'Dossiers surveillés', addFolder: 'Ajouter un dossier',
-    saveLocation: 'Emplacement', sortInWatch: 'Trier dans le dossier surveillé',
+    watchFolder: 'Dossiers gérés', addFolder: 'Ajouter un dossier',
+    saveLocation: 'Emplacement', sortInWatch: 'Trier dans le dossier géré',
     sortInWatchDesc: 'Si désactivé, tous les fichiers sont déplacés vers un dossier désigné.',
     unset: 'Non défini', select: 'Choisir',
     actionSettings: 'Comportement', moveDelay: 'Délai de déplacement', duplicate: 'Doublons',
@@ -267,8 +267,8 @@ const i18n = {
   'Español': {
     autoClean: 'Organización auto', autoCleanDesc: 'Supervisa en segundo plano y mantiene tus carpetas ordenadas en tiempo real.',
     cleanNow: 'Organizar ahora', dissolve: 'Eliminar',
-    watchFolder: 'Carpetas vigiladas', addFolder: 'Añadir carpeta',
-    saveLocation: 'Destino', sortInWatch: 'Organizar dentro de la carpeta vigilada',
+    watchFolder: 'Carpetas administradas', addFolder: 'Añadir carpeta',
+    saveLocation: 'Destino', sortInWatch: 'Organizar dentro de la carpeta administrada',
     sortInWatchDesc: 'Si está desactivado, todos los archivos se mueven a una carpeta designada.',
     unset: 'No definido', select: 'Seleccionar',
     actionSettings: 'Comportamiento', moveDelay: 'Retraso de movimiento', duplicate: 'Duplicados',
@@ -1160,10 +1160,10 @@ document.getElementById('sortToggle')?.addEventListener('change', async function
   document.getElementById('destWrap').classList.toggle('is-hidden', this.checked);
   await tauriBridge.saveSettings({ sortInWatch: this.checked });
   if (this.checked) {
-    // 감시 폴더 내 분류 활성화: 대상 폴더에서 감시 폴더로 복원
+    // 모니터링 폴더 내 분류 활성화: 대상 폴더에서 모니터링 폴더로 복원
     await tauriBridge.invoke('migrate_sorted_folders', { toDest: false });
   } else if (destFolder) {
-    // 감시 폴더 내 분류 비활성화 + 대상 폴더 존재: 감시 폴더에서 대상 폴더로 이동
+    // 모니터링 폴더 내 분류 비활성화 + 대상 폴더 존재: 모니터링 폴더에서 대상 폴더로 이동
     await tauriBridge.invoke('migrate_sorted_folders', { toDest: true });
   }
 });
@@ -1184,7 +1184,7 @@ document.querySelector('[data-i18n="quit"]')?.addEventListener('click', async ()
 // 폴더 해체 버튼 이벤트
 document.querySelector('[data-i18n="dissolve"]')?.addEventListener('click', async () => {
   if (watchFolders.length === 0) return;
-  if (confirm('모든 정렬된 폴더를 해체하고 파일들을 원래 감시 폴더 위치로 되돌리시겠습니까?\n(자동 정리 기능이 비활성화됩니다)')) {
+  if (confirm('모든 정렬된 폴더를 해체하고 파일들을 원래 모니터링 폴더 위치로 되돌리시겠습니까?\n(자동 정리 기능이 비활성화됩니다)')) {
     const count = await tauriBridge.invoke('dissolve_folders');
     if (count !== null) {
       alert(`${count}개의 파일이 복구되었습니다.`);

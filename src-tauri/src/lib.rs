@@ -330,7 +330,7 @@ fn move_file(
     }
 }
 
-// ─── 파일 감시 루프 ───────────────────────────────────────────
+// ─── 파일 모니터링 루프 ───────────────────────────────────────────
 
 fn start_watcher(app: AppHandle, state: Arc<OdreState>) {
     std::thread::spawn(move || {
@@ -352,7 +352,7 @@ fn start_watcher(app: AppHandle, state: Arc<OdreState>) {
                     let p = PathBuf::from(folder);
                     if p.exists() {
                         let _ = watcher.watch(&p, RecursiveMode::NonRecursive);
-                        log::info!("감시 시작: {:?}", p);
+                        log::info!("모니터링 시작: {:?}", p);
                     }
                 }
             }
@@ -360,7 +360,7 @@ fn start_watcher(app: AppHandle, state: Arc<OdreState>) {
             let app_clone = app.clone();
             let state_clone = state.clone();
             app.listen("watch-folders-changed", move |_| {
-                log::info!("감시 폴더 변경됨 — 재시작 필요");
+                log::info!("모니터링 폴더 변경됨 — 재시작 필요");
                 let _ = app_clone.emit("restart-required", ());
                 drop(state_clone.settings.lock());
             });
@@ -617,7 +617,7 @@ fn organize_now(app: AppHandle, state: State<Arc<OdreState>>) -> Result<u32, Str
 // 폴더 해체 기능 구현
 #[tauri::command]
 fn dissolve_folders(app: AppHandle, state: State<Arc<OdreState>>) -> Result<u32, String> {
-    // 1. 버그 픽스: 파일 해체를 시작하기 전에 감시자(Watcher)부터 끕니다!
+    // 1. 버그 픽스: 파일 해체를 시작하기 전에 모니터링자(Watcher)부터 끕니다!
     let mut settings = state.settings.lock().unwrap().clone();
     settings.enabled = false;
     *state.settings.lock().unwrap() = settings.clone();
@@ -626,7 +626,7 @@ fn dissolve_folders(app: AppHandle, state: State<Arc<OdreState>>) -> Result<u32,
 
     let mut count = 0u32;
     
-    // 설정된 모든 감시 폴더(및 대상 폴더)를 스캔 범위에 넣음
+    // 설정된 모든 모니터링 폴더(및 대상 폴더)를 스캔 범위에 넣음
     let mut base_dirs = settings.watch_folders.iter().map(PathBuf::from).collect::<Vec<_>>();
     if let Some(dest) = &settings.dest_folder {
         base_dirs.push(PathBuf::from(dest));
@@ -683,7 +683,7 @@ fn migrate_sorted_folders(
     let mut count = 0u32;
 
     if to_dest {
-        // 감시 폴더 → 대상 폴더
+        // 모니터링 폴더 → 대상 폴더
         for watch_folder in &settings.watch_folders {
             let watch_dir = PathBuf::from(watch_folder);
             if !watch_dir.exists() {
@@ -708,7 +708,7 @@ fn migrate_sorted_folders(
             }
         }
     } else {
-        // 대상 폴더 → 감시 폴더 (첫 번째)
+        // 대상 폴더 → 모니터링 폴더 (첫 번째)
         if settings.watch_folders.is_empty() || !dest_folder.exists() {
             return Ok(0);
         }

@@ -4,7 +4,7 @@
   <br/>
   <h1>Odre</h1>
   <p><b>Make Folder Sexy Again</b></p>
-  <p>Windows 환경에서 지정한 폴더를 실시간으로 감시하고, 조건에 맞게 파일들을 자동 분류하는 미니멀리즘 데스크탑 앱.</p>
+  <p>Windows 환경에서 지정한 폴더를 실시간으로 확인하고, 조건에 맞게 파일들을 자동 분류하는 미니멀리즘 데스크탑 앱.</p>
 
   <p>
     <img src="https://img.shields.io/badge/Platform-Windows-0078D6?style=flat-square&logo=windows" alt="Windows" />
@@ -18,7 +18,7 @@
 
 ## ✨ Features
 
-- **실시간 폴더 감시 (Real-time Monitoring)**: `notify` 크레이트를 활용하여 파일 생성/이동 이벤트를 지연 없이 빠르게 감지합니다.
+- **실시간 폴더 모니터링 (Real-time Monitoring)**: `notify` 크레이트를 활용하여 파일 생성/이동 이벤트를 지연 없이 빠르게 감지합니다.
 - **스마트 규칙 엔진 (Smart Rule Engine)**: 파일의 확장자나 파일명 패턴에 따라 원하는 경로로 깔끔하게 정리해 줍니다.
 - **프리미엄 UI (Premium UI/UX)**: Liquid Glass 디자인 트렌드를 반영하여 매끄러운 애니메이션 동작과 다크/라이트 테마를 제공합니다.
 - **다양한 사용자 제어**: 이동 지연 설정, 파일 중복 처리(덮어쓰기/건너뛰기/이름변경), 윈도우 시작 시 자동 실행 기능 포함.
@@ -69,7 +69,7 @@ odre/
 ├── src-tauri/            # 백엔드 (Rust)
 │   ├── src/
 │   │   ├── main.rs       # 프로그램 진입점 (Tray 아이콘 및 앱 초기화)
-│   │   └── lib.rs        # 파일 감시, 타이머, 규칙 엔진의 핵심 로직 핸들러
+│   │   └── lib.rs        # 파일 모니터링, 타이머, 규칙 엔진의 핵심 로직 핸들러
 │   ├── tauri.conf.json   # Tauri 및 NSIS 인스톨러 환경설정
 │   └── Cargo.toml        # Rust 의존성 파일
 ├── package.json          # Node.js 의존성 관리 및 빌드 스크립트
