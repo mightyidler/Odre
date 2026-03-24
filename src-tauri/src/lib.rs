@@ -107,6 +107,13 @@ fn get_folder_name(rule: &FolderRule, settings: &AppSettings) -> String {
     }
 }
 
+fn is_odre_folder_name(name: &str) -> bool {
+    name.len() >= 4
+        && name.as_bytes()[0].is_ascii_digit()
+        && name.as_bytes()[1].is_ascii_digit()
+        && name[2..].starts_with(". ")
+}
+
 // ─── 규칙 매칭 ────────────────────────────────────────────────
 
 fn find_rule<'a>(path: &Path, rules: &'a [FolderRule]) -> Option<&'a FolderRule> {
@@ -162,6 +169,36 @@ fn safe_move_file(src: &Path, dest: &Path) -> std::io::Result<()> {
         fs::remove_file(src)?;
     }
     Ok(())
+}
+
+/// 동일 이름 폴더가 있으면 파일을 병합하며 이동, 비어있는 원본 폴더 삭제
+fn merge_move_dir(src: &Path, dest: &Path, dup_action: &str) -> Result<u32, String> {
+    fs::create_dir_all(dest).map_err(|e| e.to_string())?;
+    let mut count = 0u32;
+
+    let entries = fs::read_dir(src).map_err(|e| e.to_string())?;
+    for entry in entries.flatten() {
+        let path = entry.path();
+        if path.is_file() {
+            let filename = path
+                .file_name()
+                .and_then(|n| n.to_str())
+                .unwrap_or("unknown");
+
+            if dup_action == "skip" && dest.join(filename).exists() {
+                continue;
+            }
+
+            let dest_path = unique_dest_path(dest, filename, dup_action);
+            if safe_move_file(&path, &dest_path).is_ok() {
+                count += 1;
+            }
+        }
+    }
+
+    // 빈 원본 폴더 삭제 시도
+    let _ = fs::remove_dir(src);
+    Ok(count)
 }
 
 fn resolve_dest(src: &Path, rule: &FolderRule, settings: &AppSettings) -> PathBuf {
@@ -633,6 +670,73 @@ fn dissolve_folders(app: AppHandle, state: State<Arc<OdreState>>) -> Result<u32,
 }
 
 #[tauri::command]
+fn migrate_sorted_folders(
+    state: State<Arc<OdreState>>,
+    to_dest: bool,
+) -> Result<u32, String> {
+    let settings = state.settings.lock().unwrap().clone();
+    let dest_folder = match &settings.dest_folder {
+        Some(d) if !d.is_empty() => PathBuf::from(d),
+        _ => return Ok(0),
+    };
+
+    let mut count = 0u32;
+
+    if to_dest {
+        // 감시 폴더 → 대상 폴더
+        for watch_folder in &settings.watch_folders {
+            let watch_dir = PathBuf::from(watch_folder);
+            if !watch_dir.exists() {
+                continue;
+            }
+            if let Ok(entries) = fs::read_dir(&watch_dir) {
+                for entry in entries.flatten() {
+                    let path = entry.path();
+                    if !path.is_dir() {
+                        continue;
+                    }
+                    if let Some(name) = path.file_name().and_then(|n| n.to_str()) {
+                        if is_odre_folder_name(name) {
+                            let target = dest_folder.join(name);
+                            match merge_move_dir(&path, &target, &settings.duplicate_action) {
+                                Ok(n) => count += n,
+                                Err(e) => log::error!("폴더 이동 실패: {:?} → {:?}: {}", path, target, e),
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    } else {
+        // 대상 폴더 → 감시 폴더 (첫 번째)
+        if settings.watch_folders.is_empty() || !dest_folder.exists() {
+            return Ok(0);
+        }
+        let target_watch = PathBuf::from(&settings.watch_folders[0]);
+
+        if let Ok(entries) = fs::read_dir(&dest_folder) {
+            for entry in entries.flatten() {
+                let path = entry.path();
+                if !path.is_dir() {
+                    continue;
+                }
+                if let Some(name) = path.file_name().and_then(|n| n.to_str()) {
+                    if is_odre_folder_name(name) {
+                        let target = target_watch.join(name);
+                        match merge_move_dir(&path, &target, &settings.duplicate_action) {
+                            Ok(n) => count += n,
+                            Err(e) => log::error!("폴더 복원 실패: {:?} → {:?}: {}", path, target, e),
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    Ok(count)
+}
+
+#[tauri::command]
 fn reset_settings(app: AppHandle, state: State<Arc<OdreState>>) -> Result<(), String> {
     let defaults = AppSettings::default();
     *state.settings.lock().unwrap() = defaults.clone();
@@ -713,6 +817,7 @@ pub fn run() {
             clear_history,
             organize_now,
             dissolve_folders,
+            migrate_sorted_folders,
             reset_settings,
             minimize_window,
             close_window,

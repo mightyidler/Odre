@@ -926,7 +926,7 @@ const tauriBridge = (() => {
       duplicateAction:  parsedDup,
       language:         currentLang,
       autostart:        document.querySelector('[data-i18n="autoRun"]')?.closest('.card-row')?.querySelector('input')?.checked ?? false,
-      theme:            isDark ? 'dark' : 'light',
+      theme:            currentThemeMode,
       ...partial,
     };
     await invoke('save_settings', { settings });
@@ -959,7 +959,11 @@ const tauriBridge = (() => {
     if (s.destFolder) {
       destFolder = s.destFolder;
       const destPathEl = document.querySelector('#destWrap .folder-path');
-      if (destPathEl) destPathEl.textContent = s.destFolder;
+      if (destPathEl) {
+        destPathEl.textContent = s.destFolder;
+        destPathEl.classList.remove('folder-path--muted');
+        destPathEl.removeAttribute('data-i18n');
+      }
     }
 
     const delayKeyMap = { 0: 'delay_instant', 30: 'delay_30s', 60: 'delay_1m', 300: 'delay_5m', 600: 'delay_10m' };
@@ -1102,8 +1106,17 @@ document.querySelector('#destWrap .select-btn')?.addEventListener('click', async
   if (selected) {
     destFolder = selected;
     const pathEl = document.querySelector('#destWrap .folder-path');
-    if (pathEl) pathEl.textContent = selected;
+    if (pathEl) {
+      pathEl.textContent = selected;
+      pathEl.classList.remove('folder-path--muted');
+      pathEl.removeAttribute('data-i18n');
+    }
     await tauriBridge.saveSettings({ destFolder });
+    // sortInWatch가 꺼진 상태에서 대상 폴더를 선택하면 기존 정리 폴더들을 이동
+    const sortToggle = document.getElementById('sortToggle');
+    if (sortToggle && !sortToggle.checked) {
+      await tauriBridge.invoke('migrate_sorted_folders', { toDest: true });
+    }
   }
 });
 
@@ -1146,6 +1159,13 @@ document.querySelector('[data-i18n="autoRun"]')?.closest('.card-row')?.querySele
 document.getElementById('sortToggle')?.addEventListener('change', async function() {
   document.getElementById('destWrap').classList.toggle('is-hidden', this.checked);
   await tauriBridge.saveSettings({ sortInWatch: this.checked });
+  if (this.checked) {
+    // 감시 폴더 내 분류 활성화: 대상 폴더에서 감시 폴더로 복원
+    await tauriBridge.invoke('migrate_sorted_folders', { toDest: false });
+  } else if (destFolder) {
+    // 감시 폴더 내 분류 비활성화 + 대상 폴더 존재: 감시 폴더에서 대상 폴더로 이동
+    await tauriBridge.invoke('migrate_sorted_folders', { toDest: true });
+  }
 });
 
 const origApplyLang = window.applyLang;
