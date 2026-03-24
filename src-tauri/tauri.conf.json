@@ -1,0 +1,43 @@
+{
+  "productName": "Odre",
+  "version": "0.1.0",
+  "identifier": "com.odre.app",
+  "build": {
+    "frontendDist": "../src"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "title": "Odre",
+        "visible": false,
+        "width": 480,
+        "height": 800,
+        "minWidth": 480,
+        "minHeight": 800,
+        "maxWidth": 480,
+        "maxHeight": 800,
+        "resizable": false,
+        "maximizable": false,
+        "center": true,
+        "decorations": false,
+        "transparent": false
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ]
+  },
+  "plugins": {}
+}

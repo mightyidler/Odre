@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ko"> <head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Odre</title>
+
+<script>
+  const isDarkOs = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.setAttribute('data-theme', isDarkOs ? 'dark' : 'light');
+  document.documentElement.style.backgroundColor = isDarkOs ? '#000000' : '#F2F2F7';
+</script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.min.css"/>
+<link rel="stylesheet" href="./style.css"/>
+<script src="./app.js" defer></script>
+</head>
+<body>
+<div class="app">
+
+<header class="header" data-tauri-drag-region>
+  <div class="header-top" data-tauri-drag-region>
+    <div class="header-logo" data-tauri-drag-region>
+      <svg class="logo-icon" viewBox="0 0 36 36"><use href="icons.svg#icon-logo"></use></svg>
+      <div class="logo-text" data-tauri-drag-region>
+        <span class="logo-title" data-tauri-drag-region>Odre</span>
+        <span class="logo-tagline" data-tauri-drag-region>Make Folder Sexy Again</span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="icon-btn" id="btnMinimize"><svg width="16" height="16"><use href="icons.svg#icon-minimize"></use></svg></button>
+      <button class="icon-btn" id="btnClose"><svg width="16" height="16"><use href="icons.svg#icon-close"></use></svg></button>
+    </div>
+  </div>
+  <div class="tab-bar-wrap"><div class="tab-bar" id="tabBar">
+    <div class="tab-bar__thumb" id="tabThumb"></div>
+    <button class="tab-btn is-active" data-tab="general" data-i18n="general">일반</button>
+    <button class="tab-btn" data-tab="rules" data-i18n="folderRules">폴더 규칙</button>
+  </div></div>
+</header>
+
+<main class="main">
+  <div class="tab-panel is-active" id="panel-general">
+    <div class="section-group">
+      <div class="section-label" data-i18n="status">상태</div>
+      <div class="card">
+        <div class="card-row">
+          <div class="row-label">
+            <span class="row-title" data-i18n="autoClean">자동 정리</span>
+            <span class="row-desc" data-i18n="autoCleanDesc">백그라운드에서 실시간으로 감시하며 폴더의 질서를 유지합니다.</span>
+          </div>
+          <label class="toggle"><input type="checkbox" id="autoCleanToggle"/><div class="toggle__track"></div><div class="toggle__knob"></div></label>
+        </div>
+        <div class="card-divider"></div>
+        <div class="action-row">
+          <button class="btn btn--blue" data-i18n="cleanNow">지금 정리하기</button>
+          <button class="btn btn--ghost" data-i18n="dissolve">폴더 해체</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-group">
+      <div class="section-label" data-i18n="watchFolder">감시 폴더</div>
+      <div class="card">
+        <button class="add-folder-btn">
+          <svg width="20" height="20"><use href="icons.svg#icon-plus"></use></svg>
+          폴더 추가
+        </button>
+      </div>
+    </div>
+
+    <div class="section-group">
+      <div class="section-label" data-i18n="saveLocation">저장 위치</div>
+      <div class="card">
+        <div class="card-row">
+          <div class="row-label">
+            <span class="row-title" data-i18n="sortInWatch">감시 폴더 내 분류</span>
+            <span class="row-desc" data-i18n="sortInWatchDesc">비활성화 시 모든 파일을 지정된 다른 폴더로 이동하여 분류합니다.</span>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="sortToggle" checked/>
+            <div class="toggle__track"></div><div class="toggle__knob"></div>
+          </label>
+        </div>
+        <div class="dest-wrap is-hidden" id="destWrap">
+          <div class="card-divider"></div>
+          <div class="card-row card-row--folder">
+            <svg width="20" height="20" class="folder-icon" style="flex-shrink:0;opacity:0.35;"><use href="icons.svg#icon-folder"></use></svg>
+            <span class="folder-path folder-path--muted" data-i18n="unset">미설정</span>
+            <button class="select-btn" data-i18n="select">선택</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-group">
+      <div class="section-label" data-i18n="actionSettings">동작 설정</div>
+      <div class="card card--overflow">
+        <div class="dropdown-row">
+          <span class="dropdown-label" data-i18n="moveDelay">이동 지연</span>
+          <div class="dropdown-wrap" id="dd-delay">
+            <button class="dropdown-trigger" onclick="toggleDD('dd-delay')">
+              <span class="dropdown-value" id="dd-delay-val" data-i18n-key="delay_instant">즉시</span>
+              <svg class="chevron" width="18" height="18"><use href="icons.svg#icon-chevron"></use></svg>
+            </button>
+            <div class="dropdown-menu" id="dd-delay-menu">
+              <div class="dropdown-item is-selected" data-dd="dd-delay" data-val="즉시" data-i18n-key="delay_instant">즉시<svg class="check-icon" width="14" height="14"><use href="icons.svg#icon-check"></use></svg></div>
+              <div class="dropdown-item" data-dd="dd-delay" data-val="30초" data-i18n-key="delay_30s">30초<svg class="check-icon" width="14" height="14"><use href="icons.svg#icon-check"></use></svg></div>
+              <div class="dropdown-item" data-dd="dd-delay" data-val="1분" data-i18n-key="delay_1m">1분<svg class="check-icon" width="14" height="14"><use href="icons.svg#icon-check"></use></svg></div>
+              <div class="dropdown-item" data-dd="dd-delay" data-val="5분" data-i18n-key="delay_5m">5분<svg class="check-icon" width="14" height="14"><use href="icons.svg#icon-check"></use></svg></div>
+              <div class="dropdown-item" data-dd="dd-delay" data-val="10분" data-i18n-key="delay_10m">10분<svg class="check-icon" width="14" height="14"><use href="icons.svg#icon-check"></use></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="card-divider"></div>
+        <div class="dropdown-row">
+          <span class="dropdown-label" data-i18n="duplicate">중복 파일</span>
+          <div class="dropdown-wrap" id="dd-dup">
+            <button class="dropdown-trigger" onclick="toggleDD('dd-dup')">
+              <span class="dropdown-value" id="dd-dup-val" data-i18n-key="dup_number">번호 추가(권장)</span>
+              <svg class="chevron" width="18" height="18"><use href="icons.svg#icon-chevron"></use></svg>
+            </button>
+            <div class="dropdown-menu" id="dd-dup-menu">
+              <div class="dropdown-item is-selected" data-dd="dd-dup" data-val="번호 추가(권장)" data-i18n-key="dup_number">번호 추가(권장)<svg class="check-icon" width="14" height="14"><use href="icons.svg#icon-check"></use></svg></div>
+              <div class="dropdown-item" data-dd="dd-dup" data-val="덮어쓰기" data-i18n-key="dup_overwrite">덮어쓰기<svg class="check-icon" width="14" height="14"><use href="icons.svg#icon-check"></use></svg></div>
+              <div class="dropdown-item" data-dd="dd-dup" data-val="건너뛰기" data-i18n-key="dup_skip">건너뛰기<svg class="check-icon" width="14" height="14"><use href="icons.svg#icon-check"></use></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="card-divider"></div>
+        <div class="card-row">
+          <div class="row-label">
+            <span class="row-title" data-i18n="autoRun">Windows 시작 시 자동 실행</span>
+            <span class="row-desc" data-i18n="autoRunDesc">시스템 시작 시 자동으로 실행되어 실시간 정리를 시작합니다.</span>
+          </div>
+          <label class="toggle"><input type="checkbox" checked/><div class="toggle__track"></div><div class="toggle__knob"></div></label>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-group">
+      <div class="section-label" data-i18n="language">언어 및 테마</div>
+      <div class="card card--overflow">
+        
+        <div class="dropdown-row">
+          <span class="dropdown-label" data-i18n="theme">테마</span>
+          <div class="dropdown-wrap" id="dd-theme">
+            <button class="dropdown-trigger" onclick="toggleDD('dd-theme')">
+              <span class="dropdown-value" id="dd-theme-val" data-i18n-key="theme_system">시스템 설정</span>
+              <svg class="chevron" width="18" height="18"><use href="icons.svg#icon-chevron"></use></svg>
+            </button>
+            <div class="dropdown-menu" id="dd-theme-menu">
+              <div class="dropdown-item is-selected" data-dd="dd-theme" data-val="system" data-i18n-key="theme_system">시스템 설정<svg class="check-icon" width="14" height="14"><use href="icons.svg#icon-check"></use></svg></div>
+              <div class="dropdown-item" data-dd="dd-theme" data-val="dark" data-i18n-key="theme_dark">다크 모드<svg class="check-icon" width="14" height="14"><use href="icons.svg#icon-check"></use></svg></div>
+              <div class="dropdown-item" data-dd="dd-theme" data-val="light" data-i18n-key="theme_light">라이트 모드<svg class="check-icon" width="14" height="14"><use href="icons.svg#icon-check"></use></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="card-divider"></div>
+        <div class="dropdown-row">
+          <span class="dropdown-label" data-i18n="displayLang">표시 언어</span>
+          <div class="dropdown-wrap" id="dd-lang">
+            <button class="dropdown-trigger" onclick="toggleDD('dd-lang')">
+              <span class="dropdown-value" id="dd-lang-val">한국어</span>
+              <svg class="chevron" width="18" height="18"><use href="icons.svg#icon-chevron"></use></svg>
+            </button>
+            <div class="dropdown-menu" id="dd-lang-menu">
+              <div class="dropdown-item is-selected" data-dd="dd-lang" data-val="한국어">한국어<svg class="check-icon" width="14" height="14"><use href="icons.svg#icon-check"></use></svg></div>
+              <div class="dropdown-item" data-dd="dd-lang" data-val="English">English<svg class="check-icon" width="14" height="14"><use href="icons.svg#icon-check"></use></svg></div>
+              <div class="dropdown-item" data-dd="dd-lang" data-val="日本語">日本語<svg class="check-icon" width="14" height="14"><use href="icons.svg#icon-check"></use></svg></div>
+              <div class="dropdown-item" data-dd="dd-lang" data-val="中文">中文<svg class="check-icon" width="14" height="14"><use href="icons.svg#icon-check"></use></svg></div>
+              <div class="dropdown-item" data-dd="dd-lang" data-val="Français">Français<svg class="check-icon" width="14" height="14"><use href="icons.svg#icon-check"></use></svg></div>
+              <div class="dropdown-item" data-dd="dd-lang" data-val="Español">Español<svg class="check-icon" width="14" height="14"><use href="icons.svg#icon-check"></use></svg></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-group" style="margin-top:40px">
+      <div class="card">
+        <button class="bottom-action bottom-action--red" data-i18n="reset">설정 초기화</button>
+        <div class="card-divider"></div>
+        <button class="bottom-action bottom-action--white" data-i18n="quit">Odre 종료</button>
+      </div>
+    </div>
+  </div><div class="tab-panel" id="panel-rules">
+    <div class="section-group" style="margin-top:0">
+      <div class="rules-list" id="rulesList"></div>
+      <button class="add-rule-btn" id="addRuleBtn">
+        <svg width="20" height="20"><use href="icons.svg#icon-plus"></use></svg>
+        폴더 추가
+      </button>
+    </div>
+  </div>
+
+</main>
+</div>
+
+<div class="overlay" id="overlay" onclick="closeAllDD()"></div>
+<div class="changes-bar" id="changesBar">
+  <span class="changes-bar-label" data-i18n="unsaved">변경사항이 있어요</span>
+  <button class="btn-cancel" id="btnCancel" data-i18n="cancel">취소</button>
+  <button class="btn-apply" id="btnApply" data-i18n="apply">적용</button>
+</div>
+</body>
+</html>
