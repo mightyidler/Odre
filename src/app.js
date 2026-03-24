@@ -540,8 +540,6 @@ function mkRule(rule, idx) {
       const inp = div.querySelector('.rule-text-input');
       const t2 = i18n[currentLang] || i18n['한국어'];
       inp.placeholder = rule._mode === 'filename' ? t2.filenamePlaceholder : t2.extPlaceholder;
-      inp.value = '';
-      div.querySelector('.rule-input-add-btn').classList.remove('is-visible');
       inp.focus();
     });
   });
