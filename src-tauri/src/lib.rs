@@ -463,8 +463,12 @@ fn exit_app() {
 
 #[tauri::command]
 fn show_main_window(window: Window) {
-    let _ = window.show();
-    let _ = window.set_focus();
+    // 자동 실행(--autostart) 꼬리표가 있으면 창을 숨긴 채 트레이에만 머뭅니다.
+    let args: Vec<String> = std::env::args().collect();
+    if !args.contains(&"--autostart".to_string()) {
+        let _ = window.show();
+        let _ = window.set_focus();
+    }
 }
 
 #[tauri::command]
@@ -643,13 +647,26 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_autostart::init(
             tauri_plugin_autostart::MacosLauncher::LaunchAgent,
-            None,
+            Some(vec!["--autostart"]),
         ))
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_shell::init())
         .setup(|app| {
             let settings = load_settings(app.handle());
+
+            // 자동 실행이 활성화되어 있으면 레지스트리 항목을 재등록하여
+            // --autostart 플래그가 포함되도록 합니다.
+            #[cfg(desktop)]
+            {
+                use tauri_plugin_autostart::ManagerExt;
+                let autostart = app.autolaunch();
+                if settings.autostart {
+                    let _ = autostart.disable();
+                    let _ = autostart.enable();
+                }
+            }
+
             let state = Arc::new(OdreState {
                 settings: Mutex::new(settings),
                 history: Mutex::new(vec![]),
