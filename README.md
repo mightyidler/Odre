@@ -69,7 +69,7 @@ Odre 앱을 소스 코드에서 빌드하려면 다음 준비물이 필요합니
 odre/
 ├── src/                  # 프론트엔드 (프레임워크 없는 순수 Vanilla JS, CSS)
 │   ├── index.html        # 메인 UI 레이아웃
-│   ├── style.css         # Liquid Glass 모션 및 타일 스타일링
+│   ├── style.css         # 미니멀리즘 인터페이스 및 부드러운 모션 스타일링
 │   └── app.js            # UI 로직 및 Tauri Invoke 바인딩
 ├── src-tauri/            # 백엔드 (Rust)
 │   ├── src/
