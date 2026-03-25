@@ -98,7 +98,7 @@ updater.key
 updater.key.pub
 
 # Build output
-*.exe
+#*.exe
 
 # IDEs
 .idea/
