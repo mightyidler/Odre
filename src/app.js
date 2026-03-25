@@ -1271,20 +1271,15 @@ window.addEventListener('DOMContentLoaded', async () => {
           try {
             const result = await window.__TAURI__.core.invoke('check_for_updates_manual');
             
-            if (window.__TAURI_PLUGIN_DIALOG__ && window.__TAURI_PLUGIN_DIALOG__.message) {
-              await window.__TAURI_PLUGIN_DIALOG__.message(result, { title: 'Odre 업데이트' });
-            } else if (window.__TAURI__.dialog && window.__TAURI__.dialog.message) {
-              await window.__TAURI__.dialog.message(result, { title: 'Odre 업데이트' });
-            } else {
-              alert(result);
-            }
-
+            try {
+              await window.__TAURI__.core.invoke('plugin:dialog|message', { message: result, title: 'Odre 업데이트', kind: 'info' });
+            } catch(e) { /* silent fail for dialog */ }
+            
             if (result.includes('최신')) {
               btnCheckUpdate.textContent = t.latestVersion || '최신 버전입니다';
               setTimeout(() => {
-                if (!btnCheckUpdate.disabled) {
-                  btnCheckUpdate.textContent = t.checkUpdate || '업데이트 확인';
-                }
+                btnCheckUpdate.disabled = false;
+                btnCheckUpdate.textContent = t.checkUpdate || '업데이트 확인';
               }, 3000);
             } else {
               btnCheckUpdate.disabled = false;
@@ -1292,13 +1287,10 @@ window.addEventListener('DOMContentLoaded', async () => {
             }
           } catch (err) {
             const errMsg = `${t.updateFailed || '확인 실패'}:\n${err}`;
-            if (window.__TAURI_PLUGIN_DIALOG__ && window.__TAURI_PLUGIN_DIALOG__.message) {
-              await window.__TAURI_PLUGIN_DIALOG__.message(errMsg, { title: 'Odre 업데이트 오류', kind: 'error' });
-            } else if (window.__TAURI__.dialog && window.__TAURI__.dialog.message) {
-              await window.__TAURI__.dialog.message(errMsg, { title: 'Odre 업데이트 오류', kind: 'error' });
-            } else {
-              alert(errMsg);
-            }
+            try {
+              await window.__TAURI__.core.invoke('plugin:dialog|message', { message: errMsg, title: 'Odre 업데이트 오류', kind: 'error' });
+            } catch(e) { /* silent fail */ }
+            
             btnCheckUpdate.disabled = false;
             btnCheckUpdate.textContent = t.checkUpdate || '업데이트 확인';
           }
