@@ -93,6 +93,13 @@ src-tauri/gen/
 src-tauri/wix/
 src-tauri/nsis/
 
+# Updater signing keys
+updater.key
+updater.key.pub
+
+# Build output
+*.exe
+
 # IDEs
 .idea/
 .vscode/

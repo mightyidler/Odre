@@ -175,6 +175,8 @@ const i18n = {
     dup_number: '번호 추가(권장)', dup_overwrite: '덮어쓰기', dup_skip: '건너뛰기',
     folderName: '폴더 이름', newFolder: '새 폴더',
     theme: '테마', theme_system: '시스템 설정', theme_dark: '다크 모드', theme_light: '라이트 모드',
+    updateSection: '업데이트', currentVersion: '현재 버전', checkUpdate: '업데이트 확인',
+    checking: '확인 중...', latestVersion: '최신 버전입니다', updateFound: '업데이트 발견', updateFailed: '확인 실패',
   },
   'English': {
     autoClean: 'Auto-Organize', autoCleanDesc: 'Runs in the background and keeps your folders tidy in real time.',
@@ -197,6 +199,8 @@ const i18n = {
     dup_number: 'Add Number Suffix (Recommended)', dup_overwrite: 'Overwrite', dup_skip: 'Skip',
     folderName: 'Folder Name', newFolder: 'New Folder',
     theme: 'Theme', theme_system: 'System Default', theme_dark: 'Dark Mode', theme_light: 'Light Mode',
+    updateSection: 'Update', currentVersion: 'Current Version', checkUpdate: 'Check for Updates',
+    checking: 'Checking...', latestVersion: 'Up to date', updateFound: 'Update found', updateFailed: 'Check failed',
   },
   '中文': {
     autoClean: '自动整理', autoCleanDesc: '在后台实时运行，自动保持文件夹井然有序。',
@@ -219,6 +223,8 @@ const i18n = {
     dup_number: '添加编号（推荐）', dup_overwrite: '覆盖', dup_skip: '跳过',
     folderName: '文件夹名称', newFolder: '新建文件夹',
     theme: '主题', theme_system: '系统设置', theme_dark: '深色模式', theme_light: '浅色模式',
+    updateSection: '更新', currentVersion: '当前版本', checkUpdate: '检查更新',
+    checking: '检查中...', latestVersion: '已是最新版本', updateFound: '发现更新', updateFailed: '检查失败',
   },
   '日本語': {
     autoClean: '自動整理', autoCleanDesc: 'バックグラウンドでリアルタイムに確認して、フォルダを常に整った状態に保ちます。',
@@ -241,6 +247,8 @@ const i18n = {
     dup_number: '番号を付けて保存（推奨）', dup_overwrite: '上書き', dup_skip: 'スキップ',
     folderName: 'フォルダ名', newFolder: '新しいフォルダ',
     theme: 'テーマ', theme_system: 'システム設定', theme_dark: 'ダークモード', theme_light: 'ライトモード',
+    updateSection: 'アップデート', currentVersion: '現在のバージョン', checkUpdate: 'アップデート確認',
+    checking: '確認中...', latestVersion: '最新バージョンです', updateFound: 'アップデートあり', updateFailed: '確認失敗',
   },
   'Français': {
     autoClean: 'Organisation auto', autoCleanDesc: 'Surveille en arrière-plan et maintient vos dossiers organisés en temps réel.',
@@ -263,6 +271,8 @@ const i18n = {
     dup_number: 'Ajouter un numéro (Recommandé)', dup_overwrite: 'Écraser', dup_skip: 'Ignorer',
     folderName: 'Nom du dossier', newFolder: 'Nouveau dossier',
     theme: 'Thème', theme_system: 'Système', theme_dark: 'Mode sombre', theme_light: 'Mode clair',
+    updateSection: 'Mise à jour', currentVersion: 'Version actuelle', checkUpdate: 'Vérifier',
+    checking: 'Vérification...', latestVersion: 'À jour', updateFound: 'Mise à jour disponible', updateFailed: 'Échec',
   },
   'Español': {
     autoClean: 'Organización auto', autoCleanDesc: 'Supervisa en segundo plano y mantiene tus carpetas ordenadas en tiempo real.',
@@ -285,6 +295,8 @@ const i18n = {
     dup_number: 'Agregar número (Recomendado)', dup_overwrite: 'Sobrescribir', dup_skip: 'Omitir',
     folderName: 'Nombre de carpeta', newFolder: 'Nueva carpeta',
     theme: 'Tema', theme_system: 'Sistema', theme_dark: 'Modo oscuro', theme_light: 'Modo claro',
+    updateSection: 'Actualización', currentVersion: 'Versión actual', checkUpdate: 'Buscar actualizaciones',
+    checking: 'Verificando...', latestVersion: 'Actualizado', updateFound: 'Actualización disponible', updateFailed: 'Error',
   }
 };
 
@@ -1232,4 +1244,40 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-window.addEventListener('DOMContentLoaded', async () => { await tauriBridge.loadSettings(); renderWatchFolders(); });
+window.addEventListener('DOMContentLoaded', async () => {
+  await tauriBridge.loadSettings();
+  renderWatchFolders();
+
+  // 버전 표시
+  try {
+    const version = await window.__TAURI__.app.getVersion();
+    const versionEl = document.getElementById('appVersionText');
+    if (versionEl) versionEl.textContent = `v${version}`;
+  } catch (e) {
+    const versionEl = document.getElementById('appVersionText');
+    if (versionEl) versionEl.textContent = '-';
+  }
+
+  // 업데이트 확인 버튼
+  const btnCheckUpdate = document.getElementById('btnCheckUpdate');
+  if (btnCheckUpdate) {
+    btnCheckUpdate.addEventListener('click', async () => {
+      const t = i18n[currentLang] || i18n['한국어'];
+      const versionEl = document.getElementById('appVersionText');
+
+      btnCheckUpdate.disabled = true;
+      btnCheckUpdate.textContent = t.checking || '확인 중...';
+
+      try {
+        const result = await window.__TAURI__.core.invoke('check_for_updates_manual');
+        if (versionEl) versionEl.textContent = result;
+      } catch (err) {
+        if (versionEl) versionEl.textContent = `${t.updateFailed || '확인 실패'}: ${err}`;
+      } finally {
+        btnCheckUpdate.disabled = false;
+        btnCheckUpdate.textContent = t.checkUpdate || '업데이트 확인';
+      }
+    });
+  }
+});
+

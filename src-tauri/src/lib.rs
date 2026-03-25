@@ -14,6 +14,7 @@ use tauri::{
     AppHandle, Emitter, Listener, Manager, State, Window,
 };
 use tauri_plugin_dialog::DialogExt;
+use tauri_plugin_updater::UpdaterExt;
 use tokio::sync::mpsc;
 
 // ─── 데이터 모델 ──────────────────────────────────────────────
@@ -743,12 +744,32 @@ fn reset_settings(app: AppHandle, state: State<Arc<OdreState>>) -> Result<(), St
     save_settings_to_disk(&app, &defaults)
 }
 
+#[tauri::command]
+async fn check_for_updates_manual(app: AppHandle) -> Result<String, String> {
+    match app.updater() {
+        Ok(updater) => match updater.check().await {
+            Ok(Some(update)) => {
+                log::info!("수동 업데이트 발견: {}", update.version);
+                if let Err(e) = update.download_and_install(|_, _| {}, || {}).await {
+                    return Err(format!("업데이트 설치 실패: {}", e));
+                }
+                app.restart();
+                Ok(format!("업데이트 완료: {}", update.version))
+            }
+            Ok(None) => Ok("최신 버전입니다.".to_string()),
+            Err(e) => Err(format!("업데이트 확인 실패: {}", e)),
+        },
+        Err(e) => Err(format!("업데이터 오류: {}", e)),
+    }
+}
+
 // ─── 앱 진입점 ────────────────────────────────────────────────
 
 pub fn run() {
     env_logger::init();
 
     tauri::Builder::default()
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_autostart::init(
             tauri_plugin_autostart::MacosLauncher::LaunchAgent,
             Some(vec!["--autostart"]),
@@ -758,6 +779,19 @@ pub fn run() {
         .plugin(tauri_plugin_shell::init())
         .setup(|app| {
             let settings = load_settings(app.handle());
+
+            // 완전 자동 무설정 묵시적 백그라운드 업데이트 프로세스
+            let app_clone = app.handle().clone();
+            tauri::async_runtime::spawn(async move {
+                if let Ok(updater) = app_clone.updater() {
+                    if let Ok(Some(update)) = updater.check().await {
+                        log::info!("배경 자동 업데이트 발견: {}", update.version);
+                        let _ = update.download_and_install(|_, _| {}, || {}).await;
+                        log::info!("자동 업데이트 완료, 앱을 재시작합니다.");
+                        app_clone.restart();
+                    }
+                }
+            });
 
             // 자동 실행이 활성화되어 있으면 레지스트리 항목을 재등록하여
             // --autostart 플래그가 포함되도록 합니다.
@@ -824,6 +858,7 @@ pub fn run() {
             exit_app,
             select_folder,
             show_main_window,
+            check_for_updates_manual,
         ])
         .run(tauri::generate_context!())
         .expect("Tauri 앱 실행 실패");
