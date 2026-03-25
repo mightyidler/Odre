@@ -1,6 +1,6 @@
 {
   "productName": "Odre",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "identifier": "com.odre.desktop",
   "build": {
     "frontendDist": "../src"
