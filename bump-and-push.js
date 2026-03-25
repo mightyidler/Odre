@@ -38,6 +38,12 @@ if (fs.existsSync(cargoPath)) {
 // 4. Git 커밋 및 태그 생성, 푸시
 try {
   run('git add package.json src-tauri/tauri.conf.json src-tauri/Cargo.toml');
+  
+  // 혹시 모를 로컬 변경사항 저장 및 원격 동기화
+  run('git stash');
+  run('git pull origin main --rebase');
+  run('git stash pop || echo "No stash to pop"');
+
   run(`git commit -m "chore: bump version to v${newVersion}"`);
   run(`git tag v${newVersion}`);
   

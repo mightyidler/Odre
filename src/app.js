@@ -957,6 +957,10 @@ const tauriBridge = (() => {
       nextId = Math.max(...rules.map(r => r.id)) + 1;
 
       renderRules();
+    } else {
+      if (typeof tauriBridge !== 'undefined') {
+        tauriBridge.saveSettings({ rules: defaultRules });
+      }
     }
     const autoToggle = document.querySelector('#panel-general .toggle input');
     if (autoToggle) autoToggle.checked = s.enabled ?? false;
@@ -1141,6 +1145,7 @@ document.querySelector('[data-i18n="cleanNow"]')?.addEventListener('click', asyn
       return;
     }
   }
+  await tauriBridge.saveSettings(); // Ensure any unsaved rules/settings are sent to backend before organization
   const count = await tauriBridge.invoke('organize_now');
   if (count !== null) console.log(`${count}개 파일 정리 완료`);
 });
@@ -1271,7 +1276,11 @@ window.addEventListener('DOMContentLoaded', async () => {
           try {
             const result = await window.__TAURI__.core.invoke('check_for_updates_manual');
             
-            showToast(result, 3000);
+            if (result === 'LATEST') {
+              showToast(t.latestVersion || '최신 버전입니다', 3000);
+            } else {
+              showToast(result, 3000);
+            }
             
             btnCheckUpdate.disabled = false;
             btnCheckUpdate.textContent = t.checkUpdate || '업데이트 확인';

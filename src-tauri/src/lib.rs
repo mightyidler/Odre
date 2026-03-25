@@ -153,10 +153,10 @@ fn find_rule<'a>(path: &Path, rules: &'a [FolderRule]) -> Option<&'a FolderRule>
 // ─── 파일 이동 ────────────────────────────────────────────────
 
 fn is_file_locked(path: &Path) -> bool {
-    // 🌟 .append(true)를 추가하면 브라우저가 파일을 점유하고 있을 때 더 민감하게 반응합니다.
+    // 🌟 .append(true)를 추가하면 브라우저가 파일을 점유하고 있을 때 더 민감하게 반응합니다. 
+    // 하지만 읽기 전용 파일에서 권한 에러가 발생하므로 일반적인 배타적 공유 위반만 검출하기 위해 read(true)로 검사합니다.
     match fs::OpenOptions::new()
-        .write(true)
-        .append(true) // 추가
+        .read(true)
         .open(path) 
     {
         Ok(_) => false, // 성공하면 잠겨있지 않음
@@ -761,10 +761,10 @@ async fn check_for_updates_manual(app: AppHandle) -> Result<String, String> {
                 app.restart();
                 Ok(format!("업데이트 완료: {}", update.version))
             }
-            Ok(None) => Ok("최신 버전입니다.".to_string()),
-            Err(e) => Err(format!("업데이트 확인 실패: {}", e)),
+            Ok(None) => Ok("LATEST".to_string()),
+            Err(e) => Err(e.to_string()),
         },
-        Err(e) => Err(format!("업데이터 오류: {}", e)),
+        Err(e) => Err(e.to_string()),
     }
 }
 
