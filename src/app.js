@@ -1271,25 +1271,13 @@ window.addEventListener('DOMContentLoaded', async () => {
           try {
             const result = await window.__TAURI__.core.invoke('check_for_updates_manual');
             
-            try {
-              await window.__TAURI__.core.invoke('plugin:dialog|message', { message: result, title: 'Odre 업데이트', kind: 'info' });
-            } catch(e) { /* silent fail for dialog */ }
+            showToast(result, 3000);
             
-            if (result.includes('최신')) {
-              btnCheckUpdate.textContent = t.latestVersion || '최신 버전입니다';
-              setTimeout(() => {
-                btnCheckUpdate.disabled = false;
-                btnCheckUpdate.textContent = t.checkUpdate || '업데이트 확인';
-              }, 3000);
-            } else {
-              btnCheckUpdate.disabled = false;
-              btnCheckUpdate.textContent = t.checkUpdate || '업데이트 확인';
-            }
+            btnCheckUpdate.disabled = false;
+            btnCheckUpdate.textContent = t.checkUpdate || '업데이트 확인';
           } catch (err) {
             const errMsg = `${t.updateFailed || '확인 실패'}:\n${err}`;
-            try {
-              await window.__TAURI__.core.invoke('plugin:dialog|message', { message: errMsg, title: 'Odre 업데이트 오류', kind: 'error' });
-            } catch(e) { /* silent fail */ }
+            showToast(errMsg, 3000);
             
             btnCheckUpdate.disabled = false;
             btnCheckUpdate.textContent = t.checkUpdate || '업데이트 확인';
@@ -1297,4 +1285,29 @@ window.addEventListener('DOMContentLoaded', async () => {
     });
   }
 });
+
+function showToast(message, duration = 3000) {
+  let toast = document.getElementById('global-toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'global-toast';
+    toast.className = 'changes-bar';
+    toast.style.justifyContent = 'center';
+    toast.style.padding = '12px 20px';
+    toast.style.zIndex = '9999';
+    toast.innerHTML = `<span class="changes-bar-label" id="global-toast-msg" style="text-align:center; flex:none; font-size:15px; font-weight:500;"></span>`;
+    document.body.appendChild(toast);
+  }
+  
+  document.getElementById('global-toast-msg').textContent = message;
+  
+  requestAnimationFrame(() => {
+    toast.classList.add('is-visible');
+  });
+  
+  if (toast._timer) clearTimeout(toast._timer);
+  toast._timer = setTimeout(() => {
+    toast.classList.remove('is-visible');
+  }, duration);
+}
 
