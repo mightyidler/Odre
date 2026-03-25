@@ -126,7 +126,7 @@ async function main() {
   if (!token) {
     console.warn('[publish-update] GITHUB_TOKEN이 설정되지 않았습니다. update.json 갱신 및 GitHub Release를 건너뜁니다.');
     console.warn('[publish-update] .env에 GITHUB_TOKEN=ghp_xxx 형태로 추가해 주세요.');
-    return;
+    process.exit(1);
   }
 
   const version = readVersion();
@@ -140,13 +140,14 @@ async function main() {
   const zipPath = path.join(nsisDir, zipName);
   const sigPath = path.join(nsisDir, sigName);
 
-  if (!fs.existsSync(zipPath)) {
-    console.error(`[publish-update] 빌드 파일을 찾을 수 없습니다: ${zipPath}`);
-    return;
-  }
-  if (!fs.existsSync(sigPath)) {
-    console.error(`[publish-update] 서명 파일을 찾을 수 없습니다: ${sigPath}`);
-    return;
+  if (!fs.existsSync(zipPath) || !fs.existsSync(sigPath)) {
+    console.error(`[publish-update] 빌드 파일 또는 서명 파일을 찾을 수 없습니다.`);
+    console.error(`Looking for: ${zipPath}`);
+    try {
+      console.log('--- Directory contents ---');
+      console.log(execSync(`dir "${nsisDir}"`).toString());
+    } catch (e) { console.error('Failed to list dir: ', e.message); }
+    process.exit(1);
   }
 
   const signature = fs.readFileSync(sigPath, 'utf-8').trim();
