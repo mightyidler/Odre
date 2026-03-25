@@ -1,6 +1,6 @@
 [package]
 name = "Odre"
-version = "0.1.2"
+version = "0.1.3"
 description = "Odre - Make Folder Sexy Again"
 authors = ["Odre"]
 edition = "2021"
