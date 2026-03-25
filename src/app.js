@@ -3,9 +3,9 @@ document.getElementById('btnMinimize')?.addEventListener('click', () => tauriBri
 document.getElementById('btnClose')?.addEventListener('click', () => tauriBridge.invoke('close_window'));
 
 /* ── TAB BAR ── */
-const tabBar  = document.getElementById('tabBar');
-const thumb   = document.getElementById('tabThumb');
-const tabs    = [...tabBar.querySelectorAll('.tab-btn')];
+const tabBar = document.getElementById('tabBar');
+const thumb = document.getElementById('tabThumb');
+const tabs = [...tabBar.querySelectorAll('.tab-btn')];
 let activeIdx = 0;
 
 function moveThumb(idx, animate) {
@@ -23,7 +23,7 @@ tabs.forEach((btn, idx) => {
 
     tabs[activeIdx].classList.remove('is-active');
     document.getElementById('panel-' + tabs[activeIdx].dataset.tab).classList.remove('is-active');
-    
+
     activeIdx = idx;
     btn.classList.add('is-active');
     document.getElementById('panel-' + btn.dataset.tab).classList.add('is-active');
@@ -36,7 +36,7 @@ tabs.forEach((btn, idx) => {
     }
   });
 });
-window.addEventListener('load',   () => moveThumb(0, false));
+window.addEventListener('load', () => moveThumb(0, false));
 window.addEventListener('resize', () => moveThumb(activeIdx, false));
 
 /* ── THEME (OS 동기화 및 실시간 감지) ── */
@@ -49,7 +49,7 @@ function updateThemeUI() {
   const iconSun = document.getElementById('iconSun');
   const iconMoon = document.getElementById('iconMoon');
   if (iconSun && iconMoon) {
-    iconSun.style.display  = isDark ? '' : 'none';
+    iconSun.style.display = isDark ? '' : 'none';
     iconMoon.style.display = isDark ? 'none' : '';
   }
   setTimeout(() => moveThumb(activeIdx, false), 30);
@@ -69,10 +69,10 @@ document.getElementById('themeBtn')?.addEventListener('click', async () => {
   isDark = !isDark;
   currentThemeMode = isDark ? 'dark' : 'light'; // 수동 모드로 고정
   updateThemeUI();
-  
+
   // 드롭다운 UI 텍스트도 업데이트
   updateThemeDropdownUI(currentThemeMode);
-  
+
   if (typeof tauriBridge !== 'undefined') {
     await tauriBridge.saveSettings({ theme: currentThemeMode });
   }
@@ -82,8 +82,8 @@ document.getElementById('themeBtn')?.addEventListener('click', async () => {
 function updateThemeDropdownUI(mode) {
   const themeMenu = document.getElementById('dd-theme-menu');
   if (themeMenu) {
-    themeMenu.querySelectorAll('.dropdown-item').forEach(item => { 
-      item.classList.toggle('is-selected', item.dataset.val === mode); 
+    themeMenu.querySelectorAll('.dropdown-item').forEach(item => {
+      item.classList.toggle('is-selected', item.dataset.val === mode);
     });
     const t = i18n[currentLang] || i18n['한국어'];
     const themeValEl = document.getElementById('dd-theme-val');
@@ -111,14 +111,14 @@ function toggleDD(id) {
     const opensUp = spaceBelow < menuHeight && r.top > menuHeight;
 
     menu.classList.toggle('opens-up', opensUp);
-    menu.style.left  = 'auto';
+    menu.style.left = 'auto';
     menu.style.right = right + 'px';
 
     if (opensUp) {
-      menu.style.top    = 'auto';
+      menu.style.top = 'auto';
       menu.style.bottom = (window.innerHeight - r.top + 8) + 'px';
     } else {
-      menu.style.top    = (r.bottom + 8) + 'px';
+      menu.style.top = (r.bottom + 8) + 'px';
       menu.style.bottom = 'auto';
     }
   }
@@ -309,10 +309,10 @@ function applyLang(lang) {
   });
   const addRuleBtn = document.getElementById('addRuleBtn');
   if (addRuleBtn) addRuleBtn.innerHTML = `<svg width="20" height="20"><use href="icons.svg#icon-plus"></use></svg> ${t.addFolderRule}`;
-  
+
   const addFolderBtn = document.querySelector('.add-folder-btn');
   if (addFolderBtn) addFolderBtn.innerHTML = `<svg width="20" height="20"><use href="icons.svg#icon-plus"></use></svg> ${t.addFolder}`;
-  
+
   const tagline = document.querySelector('.logo-tagline');
   if (tagline) tagline.textContent = t.tagline;
 
@@ -355,26 +355,26 @@ document.querySelectorAll('.dropdown-item').forEach(item => {
     const dd = item.dataset.dd;
     document.getElementById(dd + '-menu').querySelectorAll('.dropdown-item').forEach(i => i.classList.remove('is-selected'));
     item.classList.add('is-selected');
-    
+
     const key = item.dataset.i18nKey;
     const t = i18n[currentLang] || i18n['English'];
     const displayVal = (key && t[key]) ? t[key] : item.dataset.val;
     document.getElementById(dd + '-val').textContent = displayVal;
-    
-    if (dd === 'dd-lang') { 
-      currentLang = item.dataset.val; 
-      applyLang(item.dataset.val); 
+
+    if (dd === 'dd-lang') {
+      currentLang = item.dataset.val;
+      applyLang(item.dataset.val);
     }
-    
+
     if (dd === 'dd-theme') {
       currentThemeMode = item.dataset.val;
-      
+
       if (currentThemeMode === 'system') {
         isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       } else {
         isDark = (currentThemeMode === 'dark');
       }
-      
+
       updateThemeUI();
       if (typeof tauriBridge !== 'undefined') {
         // 이제 async가 붙어서 여기서 에러가 나지 않습니다.
@@ -392,18 +392,18 @@ document.querySelectorAll('.dropdown-item').forEach(item => {
   });
 });
 
-document.getElementById('sortToggle').addEventListener('change', function() {
+document.getElementById('sortToggle').addEventListener('change', function () {
   document.getElementById('destWrap').classList.toggle('is-hidden', this.checked);
 });
 
 const defaultRules = [
-  { id:1, name:'Video',    exts:['mp4','mov','avi','mkv','wmv'], patterns:[] },
-  { id:2, name:'Image',    exts:['jpg','jpeg','png','gif','webp','heic','jfif','bmp','svg'], patterns:[] },
-  { id:3, name:'Document', exts:['pdf','docx','xlsx','pptx','txt','md','csv','hwp'], patterns:['_report','invoice'] },
-  { id:4, name:'Audio',    exts:['mp3','wav','flac','aac','m4a','ogg'], patterns:[] },
-  { id:5, name:'Archive',  exts:['zip','rar','7z','tar','gz','alz','egg'], patterns:[] },
-  { id:6, name:'Code',     exts:['html','css','js','ts','jsx','tsx','json','py','java','c','cpp','cs','rs','go','php'], patterns:[] },
-  { id:7, name:'Design',   exts:['psd','ai','fig','xd','sketch'], patterns:[] },
+  { id: 1, name: 'Video', exts: ['mp4', 'mov', 'avi', 'mkv', 'wmv'], patterns: [] },
+  { id: 2, name: 'Image', exts: ['jpg', 'jpeg', 'png', 'gif', 'webp', 'heic', 'jfif', 'bmp', 'svg'], patterns: [] },
+  { id: 3, name: 'Document', exts: ['pdf', 'docx', 'xlsx', 'pptx', 'txt', 'md', 'csv', 'hwp'], patterns: ['_report', 'invoice'] },
+  { id: 4, name: 'Audio', exts: ['mp3', 'wav', 'flac', 'aac', 'm4a', 'ogg'], patterns: [] },
+  { id: 5, name: 'Archive', exts: ['zip', 'rar', '7z', 'tar', 'gz', 'alz', 'egg'], patterns: [] },
+  { id: 6, name: 'Code', exts: ['html', 'css', 'js', 'ts', 'jsx', 'tsx', 'json', 'py', 'java', 'c', 'cpp', 'cs', 'rs', 'go', 'php'], patterns: [] },
+  { id: 7, name: 'Design', exts: ['psd', 'ai', 'fig', 'xd', 'sketch'], patterns: [] },
 ];
 let savedRules = JSON.parse(JSON.stringify(defaultRules));
 let rules = JSON.parse(JSON.stringify(defaultRules));
@@ -465,16 +465,16 @@ function mkRule(rule, idx) {
 
   function tagsHTML() {
     const t = i18n[currentLang] || i18n['한국어'];
-    const extLabel      = t.extLabel      || '확장자';
+    const extLabel = t.extLabel || '확장자';
     const filenameLabel = t.filenameLabel || '파일명';
-    const allExts     = rules.flatMap(r => r.exts);
+    const allExts = rules.flatMap(r => r.exts);
     const allPatterns = rules.flatMap(r => r.patterns);
-    const dupExts     = new Set(allExts.filter((v, i, a) => a.indexOf(v) !== i));
+    const dupExts = new Set(allExts.filter((v, i, a) => a.indexOf(v) !== i));
     const dupPatterns = new Set(allPatterns.filter((v, i, a) => a.indexOf(v) !== i));
 
     const fnTags = rule.patterns.map(p => {
       const display = p.replace(/^\*|\*$/g, '');
-      const isDup   = dupPatterns.has(p);
+      const isDup = dupPatterns.has(p);
       return `<span class="ext-tag${isDup ? ' ext-tag--duplicate' : ''}">
         <span class="tag-type-label">${filenameLabel}</span>
         <span class="tag-value">${display}</span>
@@ -497,17 +497,17 @@ function mkRule(rule, idx) {
   div.innerHTML = `
     <div class="rule-header">
       <div class="drag-handle"><svg width="20" height="20"><use href="icons.svg#icon-drag"></use></svg></div>
-      <span class="rule-number">${String(idx+1).padStart(2,'0')}</span>
-      <input class="rule-name-input" value="${rule.name}" placeholder="${(i18n[currentLang]||i18n['한국어']).folderName||'폴더 이름'}" spellcheck="false"/>
+      <span class="rule-number">${String(idx + 1).padStart(2, '0')}</span>
+      <input class="rule-name-input" value="${rule.name}" placeholder="${(i18n[currentLang] || i18n['한국어']).folderName || '폴더 이름'}" spellcheck="false"/>
       <button class="rule-delete-btn">${xSvg}</button>
     </div>
     <div class="rule-input-row">
       <div class="input-type-switch">
         <div class="switch-thumb"></div>
-        <button class="switch-btn ${rule._mode !== 'filename' ? 'is-active' : ''}" data-mode="ext">${(i18n[currentLang]||i18n['한국어']).extLabel}</button>
-        <button class="switch-btn ${rule._mode === 'filename' ? 'is-active' : ''}" data-mode="filename">${(i18n[currentLang]||i18n['한국어']).filenameLabel}</button>
+        <button class="switch-btn ${rule._mode !== 'filename' ? 'is-active' : ''}" data-mode="ext">${(i18n[currentLang] || i18n['한국어']).extLabel}</button>
+        <button class="switch-btn ${rule._mode === 'filename' ? 'is-active' : ''}" data-mode="filename">${(i18n[currentLang] || i18n['한국어']).filenameLabel}</button>
       </div>
-      <input class="rule-text-input" placeholder="${rule._mode === 'filename' ? (i18n[currentLang]||i18n['한국어']).filenamePlaceholder : (i18n[currentLang]||i18n['한국어']).extPlaceholder}" spellcheck="false" maxlength="40"/>
+      <input class="rule-text-input" placeholder="${rule._mode === 'filename' ? (i18n[currentLang] || i18n['한국어']).filenamePlaceholder : (i18n[currentLang] || i18n['한국어']).extPlaceholder}" spellcheck="false" maxlength="40"/>
       <button class="rule-input-add-btn" title="추가">
         <svg width="16" height="16"><use href="icons.svg#icon-plus"></use></svg>
       </button>
@@ -521,10 +521,10 @@ function mkRule(rule, idx) {
     const thumb = div.querySelector('.switch-thumb');
     if (!thumb) return;
     if (!animate) thumb.style.transition = 'none';
-    thumb.style.left  = btn.offsetLeft + 'px';
+    thumb.style.left = btn.offsetLeft + 'px';
     thumb.style.width = btn.offsetWidth + 'px';
     if (!animate) {
-      thumb.getBoundingClientRect(); 
+      thumb.getBoundingClientRect();
       thumb.style.transition = '';
     }
   }
@@ -583,23 +583,23 @@ function mkRule(rule, idx) {
   });
 
   div.querySelector('.rule-delete-btn').addEventListener('click', () => {
-  const panel = document.getElementById('panel-rules');
-  const prevScroll    = panel.scrollTop;
-  const prevMaxScroll = panel.scrollHeight - panel.clientHeight;
-  const wasAtBottom   = prevMaxScroll - prevScroll < 8;
+    const panel = document.getElementById('panel-rules');
+    const prevScroll = panel.scrollTop;
+    const prevMaxScroll = panel.scrollHeight - panel.clientHeight;
+    const wasAtBottom = prevMaxScroll - prevScroll < 8;
 
-  rules = rules.filter(r => r.id !== rule.id);
-  checkChanges();
-  renderRules();
+    rules = rules.filter(r => r.id !== rule.id);
+    checkChanges();
+    renderRules();
 
-  requestAnimationFrame(() => {
     requestAnimationFrame(() => {
-      const newMaxScroll = panel.scrollHeight - panel.clientHeight;
-      if (wasAtBottom) smoothScrollTo(Math.max(0, newMaxScroll), 320);
-      else if (prevScroll > newMaxScroll) smoothScrollTo(Math.max(0, newMaxScroll), 320);
+      requestAnimationFrame(() => {
+        const newMaxScroll = panel.scrollHeight - panel.clientHeight;
+        if (wasAtBottom) smoothScrollTo(Math.max(0, newMaxScroll), 320);
+        else if (prevScroll > newMaxScroll) smoothScrollTo(Math.max(0, newMaxScroll), 320);
+      });
     });
   });
-});
 
   div.querySelector('.rule-name-input').addEventListener('change', e => {
     const r = rules.find(r => r.id === rule.id); if (r) { r.name = e.target.value; checkChanges(); }
@@ -610,7 +610,7 @@ function mkRule(rule, idx) {
     if (!activeBtn) return;
     const thumb = div.querySelector('.switch-thumb');
     thumb.style.transition = 'none';
-    thumb.style.left  = activeBtn.offsetLeft + 'px';
+    thumb.style.left = activeBtn.offsetLeft + 'px';
     thumb.style.width = activeBtn.offsetWidth + 'px';
     thumb.style.opacity = '1';
     thumb.getBoundingClientRect();
@@ -622,8 +622,8 @@ function mkRule(rule, idx) {
 
 function initDrag() {
   const list = document.getElementById('rulesList');
-  let pending=null, startX=0, startY=0;
-  let dragging=null, clone=null, offsetY=0, currentBefore=null;
+  let pending = null, startX = 0, startY = 0;
+  let dragging = null, clone = null, offsetY = 0, currentBefore = null;
   let startIndex = -1;
   let activePanel = null;
   let isChecking = false;
@@ -632,9 +632,9 @@ function initDrag() {
     // 🌟 드래그 핸들뿐만 아니라 규칙 아이템 전체를 잡아 끌 수 있게 허용하되,
     // 입력창, 스위치, 삭제 버튼 등 실제 클릭해야 하는 인터랙트 요소들은 드래그에서 제외합니다.
     if (e.target.closest('input, button, .ext-tag__remove, .switch-btn, .input-type-switch')) {
-      return; 
+      return;
     }
-    
+
     pending = e.currentTarget;
     startX = e.clientX; startY = e.clientY;
     document.addEventListener('pointermove', onPendingMove);
@@ -644,7 +644,7 @@ function initDrag() {
   function onPendingMove(e) {
     if (!pending) return;
     const dx = e.clientX - startX, dy = e.clientY - startY;
-    if (Math.sqrt(dx*dx + dy*dy) < 8) return;
+    if (Math.sqrt(dx * dx + dy * dy) < 8) return;
     document.removeEventListener('pointermove', onPendingMove);
     document.removeEventListener('pointerup', onPendingUp);
     beginDrag(pending, e);
@@ -679,7 +679,7 @@ function initDrag() {
     document.body.appendChild(clone);
 
     item.classList.add('is-dragging-source');
-    list.classList.add('is-dragging'); 
+    list.classList.add('is-dragging');
 
     document.body.style.userSelect = 'none';
     document.addEventListener('pointermove', onMove);
@@ -693,11 +693,11 @@ function initDrag() {
     if (!clone || !dragging) {
       isChecking = false; return;
     }
-    
+
     // 최적화: querySelectorAll 대신 children 기반 필터 사용
     const items = Array.from(list.children).filter(el => el.classList.contains('rule-item'));
     let newBefore = null;
-    
+
     for (let i = 0; i < items.length; i++) {
       const it = items[i];
       if (it === dragging) continue;
@@ -745,7 +745,7 @@ function initDrag() {
       activePanel.scrollTop += dy;
       if (!isChecking) {
         isChecking = true;
-        checkIntersections(); 
+        checkIntersections();
       }
     }
     autoScrollRaf = requestAnimationFrame(doAutoScroll);
@@ -796,15 +796,15 @@ function initDrag() {
 
       itemsFinal.forEach((el, i) => {
         const numEl = el.querySelector('.rule-number');
-        if (numEl) numEl.textContent = String(i+1).padStart(2,'0');
+        if (numEl) numEl.textContent = String(i + 1).padStart(2, '0');
       });
 
       const d = dragging; dragging = null; currentBefore = null; activePanel = null;
       if (d) { d.style.transition = ''; d.style.opacity = ''; }
       itemsFinal.forEach(it => { it.style.transition = ''; it.style.transform = ''; });
-      
+
       if (startIndex !== -1 && startIndex !== endIndex) {
-          checkChanges();
+        checkChanges();
       }
     }, 220);
   }
@@ -818,20 +818,20 @@ let scrollAnimId = null;
 function smoothScrollTo(targetY, duration) {
   duration = duration || 380;
   if (scrollAnimId) { cancelAnimationFrame(scrollAnimId); scrollAnimId = null; }
-  
+
   // 현재 보고 있는 탭 패널을 찾아서 거기서 스크롤을 굴림
   const activePanel = document.querySelector('.tab-panel.is-active');
   if (!activePanel) return;
 
   const startY = activePanel.scrollTop;
-  const diff   = targetY - startY;
+  const diff = targetY - startY;
   if (Math.abs(diff) < 1) return;
-  
+
   let startTime = null;
   function ease(t) { return 1 - Math.pow(1 - t, 3); }
   function step(now) {
     if (!startTime) startTime = now;
-    const elapsed  = now - startTime;
+    const elapsed = now - startTime;
     const progress = Math.min(elapsed / duration, 1);
     activePanel.scrollTo(0, startY + diff * ease(progress));
     if (progress < 1) { scrollAnimId = requestAnimationFrame(step); }
@@ -843,10 +843,10 @@ function smoothScrollTo(targetY, duration) {
 // 폴더 추가(addRuleBtn) 버튼 이벤트 
 document.getElementById('addRuleBtn').addEventListener('click', () => {
   rules.push({ id: nextId++, name: '', exts: [], patterns: [] });
-  
+
   const panel = document.getElementById('panel-rules');
-  panel.style.paddingBottom = '100px'; 
-  
+  panel.style.paddingBottom = '100px';
+
   document.getElementById('changesBar').classList.add('is-visible');
   hasChanges = true;
   renderRules();
@@ -861,7 +861,7 @@ document.getElementById('addRuleBtn').addEventListener('click', () => {
         const input = lastItem.querySelector('.rule-name-input');
         if (input) input.focus({ preventScroll: true });
       }
-    }, 400); 
+    }, 400);
   });
 });
 
@@ -871,7 +871,7 @@ renderRules();
 document.getElementById('btnCancel').addEventListener('click', () => {
   const panel = document.getElementById('panel-rules');
   const prevScroll = panel.scrollTop;
-  
+
   rules = JSON.parse(JSON.stringify(savedRules));
   renderRules();
 
@@ -905,7 +905,7 @@ const tauriBridge = (() => {
   async function saveSettings(partial = {}) {
     const delayMapValues = { 'delay_instant': 0, 'delay_30s': 30, 'delay_1m': 60, 'delay_5m': 300, 'delay_10m': 600 };
     const dupMapValues = { 'dup_number': 'number', 'dup_overwrite': 'overwrite', 'dup_skip': 'skip' };
-    
+
     const selectedDelayItem = document.querySelector('#dd-delay-menu .dropdown-item.is-selected');
     const delayKey = selectedDelayItem ? selectedDelayItem.dataset.i18nKey : 'delay_instant';
     const parsedDelay = delayMapValues[delayKey] ?? 0;
@@ -915,16 +915,16 @@ const tauriBridge = (() => {
     const parsedDup = dupMapValues[dupKey] ?? 'number';
 
     const settings = {
-      watchFolders:     watchFolders,
-      rules:            rules,
-      enabled:          document.querySelector('#panel-general .toggle input')?.checked ?? true,
-      sortInWatch:      document.getElementById('sortToggle')?.checked ?? true,
-      destFolder:       destFolder || null,
-      moveDelaySecs:    parsedDelay,
-      duplicateAction:  parsedDup,
-      language:         currentLang,
-      autostart:        document.querySelector('[data-i18n="autoRun"]')?.closest('.card-row')?.querySelector('input')?.checked ?? false,
-      theme:            currentThemeMode,
+      watchFolders: watchFolders,
+      rules: rules,
+      enabled: document.querySelector('#panel-general .toggle input')?.checked ?? true,
+      sortInWatch: document.getElementById('sortToggle')?.checked ?? true,
+      destFolder: destFolder || null,
+      moveDelaySecs: parsedDelay,
+      duplicateAction: parsedDup,
+      language: currentLang,
+      autostart: document.querySelector('[data-i18n="autoRun"]')?.closest('.card-row')?.querySelector('input')?.checked ?? false,
+      theme: currentThemeMode,
       ...partial,
     };
     await invoke('save_settings', { settings });
@@ -940,10 +940,10 @@ const tauriBridge = (() => {
     if (s.rules && s.rules.length > 0) {
       savedRules = JSON.parse(JSON.stringify(s.rules));
       rules = JSON.parse(JSON.stringify(s.rules));
-      
+
       // 버그 수정: 불러온 데이터의 최고 ID 값을 찾아 nextId 업데이트
       nextId = Math.max(...rules.map(r => r.id)) + 1;
-      
+
       renderRules();
     }
     const autoToggle = document.querySelector('#panel-general .toggle input');
@@ -995,7 +995,7 @@ const tauriBridge = (() => {
       else if (osLang.startsWith('fr')) langToSet = 'Français';
       else if (osLang.startsWith('es')) langToSet = 'Español';
       else langToSet = 'English';
-      
+
       if (s.language !== langToSet && typeof tauriBridge !== 'undefined') {
         tauriBridge.saveSettings({ language: langToSet });
       }
@@ -1011,7 +1011,7 @@ const tauriBridge = (() => {
     }
     if (s.theme) {
       currentThemeMode = s.theme; // 현재 모드 저장 (system/dark/light)
-      
+
       if (currentThemeMode === 'system') {
         isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       } else {
@@ -1026,10 +1026,10 @@ const tauriBridge = (() => {
   return { invoke, saveSettings, loadSettings };
 })();
 
-window.addEventListener('DOMContentLoaded', async () => { 
+window.addEventListener('DOMContentLoaded', async () => {
   await tauriBridge.loadSettings();  // 테마 및 세팅 완벽하게 로드
-  renderWatchFolders(); 
-  
+  renderWatchFolders();
+
   // 🌟 모든 세팅과 색상이 입혀진 뒤에 비로소 창을 짠! 하고 띄웁니다.
   await tauriBridge.invoke('show_main_window');
 });
@@ -1089,7 +1089,7 @@ function renderWatchFolders() {
 document.querySelector('.add-folder-btn')?.addEventListener('click', async () => {
   // 원래 만들어두었던 Rust 백엔드의 안전한 폴더 선택기 호출
   const selected = await tauriBridge.invoke('select_folder');
-  
+
   if (selected && !watchFolders.includes(selected)) {
     watchFolders.push(selected);
     renderWatchFolders();
@@ -1100,7 +1100,7 @@ document.querySelector('.add-folder-btn')?.addEventListener('click', async () =>
 document.querySelector('#destWrap .select-btn')?.addEventListener('click', async () => {
   // 동일하게 Rust 백엔드 폴더 선택기 호출
   const selected = await tauriBridge.invoke('select_folder');
-  
+
   if (selected) {
     destFolder = selected;
     const pathEl = document.querySelector('#destWrap .folder-path');
@@ -1133,7 +1133,7 @@ document.querySelector('[data-i18n="cleanNow"]')?.addEventListener('click', asyn
   if (count !== null) console.log(`${count}개 파일 정리 완료`);
 });
 
-document.querySelector('#panel-general .toggle input')?.addEventListener('change', async function() { 
+document.querySelector('#panel-general .toggle input')?.addEventListener('change', async function () {
   if (this.checked && watchFolders.length === 0) {
     this.checked = false;
     const selected = await tauriBridge.invoke('select_folder');
@@ -1146,15 +1146,15 @@ document.querySelector('#panel-general .toggle input')?.addEventListener('change
       return;
     }
   }
-  await tauriBridge.saveSettings({ enabled: this.checked }); 
+  await tauriBridge.saveSettings({ enabled: this.checked });
   if (this.checked) {
     const count = await tauriBridge.invoke('organize_now');
     if (count > 0) console.log(`${count}개 파일 자동 정리 완료`);
   }
 });
 
-document.querySelector('[data-i18n="autoRun"]')?.closest('.card-row')?.querySelector('input')?.addEventListener('change', async function() { await tauriBridge.saveSettings({ autostart: this.checked }); });
-document.getElementById('sortToggle')?.addEventListener('change', async function() {
+document.querySelector('[data-i18n="autoRun"]')?.closest('.card-row')?.querySelector('input')?.addEventListener('change', async function () { await tauriBridge.saveSettings({ autostart: this.checked }); });
+document.getElementById('sortToggle')?.addEventListener('change', async function () {
   document.getElementById('destWrap').classList.toggle('is-hidden', this.checked);
   await tauriBridge.saveSettings({ sortInWatch: this.checked });
   if (this.checked) {
@@ -1167,7 +1167,7 @@ document.getElementById('sortToggle')?.addEventListener('change', async function
 });
 
 const origApplyLang = window.applyLang;
-window.applyLang = async function(lang) {
+window.applyLang = async function (lang) {
   if (origApplyLang) origApplyLang.call(this, lang);
   await tauriBridge.saveSettings({ language: lang });
 };
@@ -1186,7 +1186,7 @@ document.querySelector('[data-i18n="dissolve"]')?.addEventListener('click', asyn
     const count = await tauriBridge.invoke('dissolve_folders');
     if (count !== null) {
       alert(`${count}개의 파일이 복구되었습니다.`);
-      await tauriBridge.loadSettings(); 
+      await tauriBridge.loadSettings();
     }
   }
 });
@@ -1196,15 +1196,15 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Tab') {
     const active = document.activeElement;
     if (!active) return;
-    
+
     if (active.classList.contains('rule-name-input') || active.classList.contains('rule-text-input')) {
       let allInputs = Array.from(document.querySelectorAll('.rule-name-input, .rule-text-input'));
       let idx = allInputs.indexOf(active);
       if (idx === -1) return;
-      
+
       const isShift = e.shiftKey;
       let targetIdx = isShift ? idx - 1 : idx + 1;
-      
+
       // 첫 항목에서 뒤로(Shift+Tab) 가면 맨 끝으로, 마지막에서 앞(Tab)으로 가면 맨 처음으로 무한 순환
       if (targetIdx < 0) targetIdx = allInputs.length - 1;
       else if (targetIdx >= allInputs.length) targetIdx = 0;
@@ -1213,12 +1213,12 @@ document.addEventListener('keydown', (e) => {
       if (active.classList.contains('rule-text-input') && active.value.trim().length > 0) {
         e.preventDefault();
         active.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
-        
+
         // DOM이 새로 그려졌으므로, focus 할 최신 UI 목록을 다시 가져옴
         const newInputs = Array.from(document.querySelectorAll('.rule-name-input, .rule-text-input'));
-        
+
         if (targetIdx >= newInputs.length) targetIdx = 0;
-        
+
         if (targetIdx >= 0 && targetIdx < newInputs.length) {
           newInputs[targetIdx].focus();
         }

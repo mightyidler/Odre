@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "tauri dev",
     "build": "tauri build",
+    "postbuild": "node copy-build-output.js",
     "tauri": "tauri"
   },
   "devDependencies": {
