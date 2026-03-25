@@ -14,12 +14,13 @@ jobs:
     runs-on: windows-latest
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -28,11 +29,6 @@ jobs:
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
-
-      - name: Determine Rust Cache Key
-        id: rust-cache-key
-        run: echo "key=${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}" >> $GITHUB_OUTPUT
-        shell: bash
 
       - name: Cache Rust dependencies
         uses: actions/cache@v4
@@ -43,15 +39,45 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             src-tauri/target/
-          key: ${{ steps.rust-cache-key.outputs.key }}
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
       - name: Install JS dependencies
-        run: npm ci || npm install
+        run: npm ci
 
-      - name: Build and Publish Release
+      - name: Inject updater pubkey
+        run: node inject-updater-key.js inject
+        env:
+          TAURI_UPDATER_PUBKEY: ${{ secrets.TAURI_UPDATER_PUBKEY }}
+
+      - name: Build Tauri app (with signing)
+        uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAURI_UPDATER_PUBKEY: ${{ secrets.TAURI_UPDATER_PUBKEY }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
-        run: npm run build-ci
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: 'Odre ${{ github.ref_name }}'
+          releaseBody: 'Odre ${{ github.ref_name }} 릴리스'
+          releaseDraft: false
+          prerelease: false
+          includeUpdaterJson: false
+
+      - name: Restore pubkey placeholder
+        if: always()
+        run: node inject-updater-key.js restore
+        env:
+          TAURI_UPDATER_PUBKEY: ${{ secrets.TAURI_UPDATER_PUBKEY }}
+
+      - name: Publish update.json
+        run: node publish-update.js
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Commit and push update.json
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add update.json
+          git diff --staged --quiet || git commit -m "chore: update update.json for ${{ github.ref_name }}"
+          git push origin HEAD:main
