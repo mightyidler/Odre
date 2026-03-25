@@ -53,7 +53,7 @@ impl Default for AppSettings {
             move_delay_secs: 0,
             duplicate_action: "number".into(),
             language: "auto".into(),
-            autostart: false,
+            autostart: true,
             theme: "system".into(),
         }
     }
