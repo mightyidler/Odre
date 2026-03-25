@@ -205,6 +205,10 @@ async function main() {
 
   // 4. update.json을 git commit + push
   try {
+    if (process.env.GITHUB_ACTIONS) {
+      execSync('git config user.name "github-actions[bot]"', { cwd: __dirname });
+      execSync('git config user.email "github-actions[bot]@users.noreply.github.com"', { cwd: __dirname });
+    }
     execSync('git add update.json', { cwd: __dirname, stdio: 'pipe' });
     execSync(`git commit -m "chore: update update.json for ${tag}"`, { cwd: __dirname, stdio: 'pipe' });
     execSync('git push origin main', { cwd: __dirname, stdio: 'pipe' });

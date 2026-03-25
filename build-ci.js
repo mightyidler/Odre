@@ -35,14 +35,16 @@ function run(cmd, extraEnv = {}) {
 }
 
 async function main() {
-  // 0. 사전 검증
-  if (!fs.existsSync(KEY_PATH)) {
-    console.error('❌ updater.key 파일을 찾을 수 없습니다. 먼저 npx tauri signer generate 를 실행해 주세요.');
-    process.exit(1);
-  }
+  let privateKey = process.env.TAURI_SIGNING_PRIVATE_KEY;
+  let password = process.env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD || loadEnvValue('TAURI_SIGNING_PRIVATE_KEY_PASSWORD');
 
-  const privateKey = fs.readFileSync(KEY_PATH, 'utf-8').trim();
-  const password = loadEnvValue('TAURI_SIGNING_PRIVATE_KEY_PASSWORD');
+  if (!privateKey) {
+    if (!fs.existsSync(KEY_PATH)) {
+      console.error('❌ updater.key 파일을 찾을 수 없으며, 환경변수(TAURI_SIGNING_PRIVATE_KEY)도 설정되지 않았습니다. 먼저 npx tauri signer generate 를 실행해 주세요.');
+      process.exit(1);
+    }
+    privateKey = fs.readFileSync(KEY_PATH, 'utf-8').trim();
+  }
 
   // 1. pubkey 주입
   console.log('━━━ [1/5] pubkey 주입 ━━━');

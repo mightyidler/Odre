@@ -1250,7 +1250,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   // 버전 표시
   try {
-    const version = await window.__TAURI__.app.getVersion();
+    const version = await window.__TAURI__.core.invoke('get_app_version');
     const versionEl = document.getElementById('appVersionText');
     if (versionEl) versionEl.textContent = `v${version}`;
   } catch (e) {
@@ -1268,15 +1268,15 @@ window.addEventListener('DOMContentLoaded', async () => {
       btnCheckUpdate.disabled = true;
       btnCheckUpdate.textContent = t.checking || '확인 중...';
 
-      try {
-        const result = await window.__TAURI__.core.invoke('check_for_updates_manual');
-        if (versionEl) versionEl.textContent = result;
-      } catch (err) {
-        if (versionEl) versionEl.textContent = `${t.updateFailed || '확인 실패'}: ${err}`;
-      } finally {
-        btnCheckUpdate.disabled = false;
-        btnCheckUpdate.textContent = t.checkUpdate || '업데이트 확인';
-      }
+          try {
+            const result = await window.__TAURI__.core.invoke('check_for_updates_manual');
+            alert(result);
+          } catch (err) {
+            alert(`${t.updateFailed || '확인 실패'}:\n${err}`);
+          } finally {
+            btnCheckUpdate.disabled = false;
+            btnCheckUpdate.textContent = t.checkUpdate || '업데이트 확인';
+          }
     });
   }
 });

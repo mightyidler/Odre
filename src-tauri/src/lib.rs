@@ -745,6 +745,11 @@ fn reset_settings(app: AppHandle, state: State<Arc<OdreState>>) -> Result<(), St
 }
 
 #[tauri::command]
+fn get_app_version(app: AppHandle) -> String {
+    app.package_info().version.to_string()
+}
+
+#[tauri::command]
 async fn check_for_updates_manual(app: AppHandle) -> Result<String, String> {
     match app.updater() {
         Ok(updater) => match updater.check().await {
@@ -859,6 +864,7 @@ pub fn run() {
             select_folder,
             show_main_window,
             check_for_updates_manual,
+            get_app_version,
         ])
         .run(tauri::generate_context!())
         .expect("Tauri 앱 실행 실패");

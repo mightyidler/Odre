@@ -15,8 +15,12 @@ const ENV_PATH = path.join(__dirname, '.env');
 const PLACEHOLDER = 'REPLACE_WITH_UPDATER_PUBKEY';
 
 function readEnv() {
+  if (process.env.TAURI_UPDATER_PUBKEY) {
+    return process.env.TAURI_UPDATER_PUBKEY.trim();
+  }
+
   if (!fs.existsSync(ENV_PATH)) {
-    console.error('[inject-updater-key] .env 파일을 찾을 수 없습니다. updater.key.pub 에서 TAURI_UPDATER_PUBKEY를 .env에 설정해 주세요.');
+    console.error('[inject-updater-key] .env 파일을 찾을 수 없고, 환경변수 TAURI_UPDATER_PUBKEY도 할당되지 않았습니다. updater.key.pub 값을 참조하여 설정해주세요.');
     process.exit(1);
   }
   const content = fs.readFileSync(ENV_PATH, 'utf-8');
