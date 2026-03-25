@@ -172,7 +172,7 @@ async function main() {
       console.log(`[publish-update] 기존 Release 사용: ${release.html_url}`);
     } catch {
       console.error('[publish-update] Release를 찾을 수 없습니다. 중단합니다.');
-      return;
+      process.exit(1);
     }
   }
 
@@ -184,7 +184,7 @@ async function main() {
     console.log(`[publish-update] 업로드 완료: ${asset.browser_download_url}`);
   } catch (err) {
     console.error(`[publish-update] 업로드 실패: ${err.message}`);
-    return;
+    process.exit(1);
   }
 
   // 3. update.json 갱신
@@ -211,10 +211,12 @@ async function main() {
     }
     execSync('git add update.json', { cwd: __dirname, stdio: 'pipe' });
     execSync(`git commit -m "chore: update update.json for ${tag}"`, { cwd: __dirname, stdio: 'pipe' });
-    execSync('git push origin main', { cwd: __dirname, stdio: 'pipe' });
+    // Detached HEAD 상태에서 origin main으로 푸시
+    execSync('git push origin HEAD:main', { cwd: __dirname, stdio: 'pipe' });
     console.log('[publish-update] update.json을 GitHub에 push 완료');
   } catch (err) {
     console.warn(`[publish-update] git push 실패 (수동으로 push 해주세요): ${err.message}`);
+    process.exit(1);
   }
 
   console.log(`\n✅ 배포 완료! 기존 사용자의 앱이 자동으로 v${version}으로 업데이트됩니다.`);
