@@ -161,8 +161,8 @@ textarea {
   -webkit-user-select: auto !important;
 }
 
-/* 스크롤 최적화: 스크롤 중에는 마우스 Hover 연산을 강제로 꺼버림 */
-.is-scrolling * {
+/* 스크롤 최적화: 스크롤 중에는 규칙 아이템 내부의 마우스 Hover 연산을 강제로 꺼버림 */
+.is-scrolling .rule-item {
   pointer-events: none !important;
 }
 
