@@ -791,9 +791,15 @@ pub fn run() {
                 if let Ok(updater) = app_clone.updater() {
                     if let Ok(Some(update)) = updater.check().await {
                         log::info!("배경 자동 업데이트 발견: {}", update.version);
-                        let _ = update.download_and_install(|_, _| {}, || {}).await;
-                        log::info!("자동 업데이트 완료, 앱을 재시작합니다.");
-                        app_clone.restart();
+                        match update.download_and_install(|_, _| {}, || {}).await {
+                            Ok(_) => {
+                                log::info!("자동 업데이트 완료, 앱을 재시작합니다.");
+                                app_clone.restart();
+                            }
+                            Err(e) => {
+                                log::error!("자동 업데이트 실패: {}", e);
+                            }
+                        }
                     }
                 }
             });
