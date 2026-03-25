@@ -1,11 +1,11 @@
 {
-  "version": "0.1.16",
-  "notes": "Odre 0.1.16 업데이트",
-  "pub_date": "2026-03-25T13:56:02.611Z",
+  "version": "0.1.17",
+  "notes": "Odre 0.1.17 업데이트",
+  "pub_date": "2026-03-25T14:14:43.992Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUdEZGNHdzcy9rMVBGL0xvQ1pXVGdXVG1DV3ZxM3kzOE1VZ1Q2ZE1wSGNvc3A4TlBjK29mY0tVVHVZVk4rU21qQkpNZ1JXZ0tGQlg1eDNmQkFFd2tpZndEbklUeGZxZ1FZPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzc0NDQ2OTU3CWZpbGU6T2RyZV8wLjEuMTZfeDY0LXNldHVwLmV4ZQpCSEVUY1Y0bk9RVzBTbVU3M0VsaTRiK2V5ZFB1aGJjTmtwNkxHdXVxWEJ6aitQQ2c0YkRsQ1UzR2dIc2J6WWZ0RGtWYTZmRFdGU3gvNHFlYWZLVlJEUT09Cg==",
-      "url": "https://github.com/mightyidler/Odre/releases/download/v0.1.16/Odre_0.1.16_x64-setup.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUdEZGNHdzcy9rMU90aksycnNFeHUyVkhNbENqNG5iT3RsWVp5bWJpdXRBeVJ1a2FWb0EveXRwMW9LWTNWL0llMERoUlJkL3hraGF3bTY4WEFnOUNPS1p1WDI4bjFmd1FVPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzc0NDQ4MDc5CWZpbGU6T2RyZV8wLjEuMTdfeDY0LXNldHVwLmV4ZQpUUFlUR3NUY0JydUthZWRJUXN6bG9TMlhaQStldWdFbVlYdW0wMFFQeXkvdzFWMTNwcVBwZktXQVVxZ3gxTUdCcDRpSEpaN3JSWXRrWlByWmJ4K2FDUT09Cg==",
+      "url": "https://github.com/mightyidler/Odre/releases/download/v0.1.17/Odre_0.1.17_x64-setup.exe"
     }
   }
 }
