@@ -1,11 +1,11 @@
 {
-  "version": "0.1.0",
-  "notes": "Initial release",
-  "pub_date": "2026-03-25T00:00:00Z",
+  "version": "0.1.12",
+  "notes": "Odre 0.1.12 업데이트",
+  "pub_date": "2026-03-25T12:38:25.945Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "",
-      "url": "https://github.com/mightyidler/Odre/releases/latest"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUdEZGNHdzcy9rMUdIekpQUll5NXNELzVlZDArektjK09XdDBnTnVjczVBRHVaN0Q1dGJNU3IwdjFzZlBBbzBuYTdHODRzMmMxc0s2QzZMd0JzSW9QVm5pSE9WMWZTWXdjPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzc0NDQyMzAyCWZpbGU6T2RyZV8wLjEuMTJfeDY0LXNldHVwLmV4ZQphcWJCNUt5RmxNNk1nOGFUVTFxVGh4VHZDelNscUJkM3I0dGpVU2N3ekM4K2l3T0poUzM2bmZwWXJYTjExZXExZkVNVXllODFkcEhzZjg5TXhoaHFEQT09Cg==",
+      "url": "https://github.com/mightyidler/Odre/releases/download/v0.1.12/Odre_0.1.12_x64-setup.exe"
     }
   }
 }
