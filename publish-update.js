@@ -2,7 +2,7 @@
  * publish-update.js
  * 
  * tauri-apps/tauri-action이 이미 GitHub Release 및 파일 업로드를 마친 후 실행됩니다.
- * 1. 해당 태그의 GitHub Release에서 .nsis.zip 자산 URL과 서명(.sig)을 가져옴
+ * 1. 해당 태그의 GitHub Release에서 -setup.exe 자산 URL과 서명(.sig)을 가져옴
  * 2. update.json을 새 버전 정보로 갱신
  */
 const fs = require('fs');
@@ -108,18 +108,18 @@ async function main() {
   console.log(`[publish-update] 자산 목록:`);
   release.assets.forEach(a => console.log(`  - ${a.name}`));
 
-  // .nsis.zip 자산 찾기
-  const zipAsset = release.assets.find(a => a.name.endsWith('.nsis.zip'));
-  if (!zipAsset) {
-    console.error('[publish-update] .nsis.zip 자산을 찾을 수 없습니다. tauri-action이 서명과 함께 빌드했는지 확인하세요.');
+  // -setup.exe 자산 찾기 (Tauri v2는 .nsis.zip 대신 서명된 .exe를 사용)
+  const exeAsset = release.assets.find(a => a.name.endsWith('-setup.exe'));
+  if (!exeAsset) {
+    console.error('[publish-update] -setup.exe 자산을 찾을 수 없습니다. tauri-action이 서명과 함께 빌드했는지 확인하세요.');
     console.error('사용 가능한 자산:', release.assets.map(a => a.name).join(', '));
     process.exit(1);
   }
 
-  // .nsis.zip.sig 자산 찾기
-  const sigAsset = release.assets.find(a => a.name.endsWith('.nsis.zip.sig'));
+  // -setup.exe.sig 서명 파일 찾기
+  const sigAsset = release.assets.find(a => a.name.endsWith('-setup.exe.sig'));
   if (!sigAsset) {
-    console.error('[publish-update] .nsis.zip.sig 서명 파일을 찾을 수 없습니다.');
+    console.error('[publish-update] -setup.exe.sig 서명 파일을 찾을 수 없습니다.');
     console.error('사용 가능한 자산:', release.assets.map(a => a.name).join(', '));
     process.exit(1);
   }
@@ -136,7 +136,7 @@ async function main() {
     platforms: {
       'windows-x86_64': {
         signature: signature,
-        url: zipAsset.browser_download_url,
+        url: exeAsset.browser_download_url,
       },
     },
   };
@@ -144,7 +144,7 @@ async function main() {
   fs.writeFileSync(UPDATE_JSON_PATH, JSON.stringify(updateData, null, 2) + '\n', 'utf-8');
   console.log(`[publish-update] update.json 갱신 완료`);
   console.log(`  버전: ${version}`);
-  console.log(`  URL: ${zipAsset.browser_download_url}`);
+  console.log(`  URL: ${exeAsset.browser_download_url}`);
   console.log(`  서명: ${signature.substring(0, 30)}...`);
 }
 
