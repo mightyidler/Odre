@@ -1270,10 +1270,35 @@ window.addEventListener('DOMContentLoaded', async () => {
 
           try {
             const result = await window.__TAURI__.core.invoke('check_for_updates_manual');
-            alert(result);
+            
+            if (window.__TAURI_PLUGIN_DIALOG__ && window.__TAURI_PLUGIN_DIALOG__.message) {
+              await window.__TAURI_PLUGIN_DIALOG__.message(result, { title: 'Odre 업데이트' });
+            } else if (window.__TAURI__.dialog && window.__TAURI__.dialog.message) {
+              await window.__TAURI__.dialog.message(result, { title: 'Odre 업데이트' });
+            } else {
+              alert(result);
+            }
+
+            if (result.includes('최신')) {
+              btnCheckUpdate.textContent = t.latestVersion || '최신 버전입니다';
+              setTimeout(() => {
+                if (!btnCheckUpdate.disabled) {
+                  btnCheckUpdate.textContent = t.checkUpdate || '업데이트 확인';
+                }
+              }, 3000);
+            } else {
+              btnCheckUpdate.disabled = false;
+              btnCheckUpdate.textContent = t.checkUpdate || '업데이트 확인';
+            }
           } catch (err) {
-            alert(`${t.updateFailed || '확인 실패'}:\n${err}`);
-          } finally {
+            const errMsg = `${t.updateFailed || '확인 실패'}:\n${err}`;
+            if (window.__TAURI_PLUGIN_DIALOG__ && window.__TAURI_PLUGIN_DIALOG__.message) {
+              await window.__TAURI_PLUGIN_DIALOG__.message(errMsg, { title: 'Odre 업데이트 오류', kind: 'error' });
+            } else if (window.__TAURI__.dialog && window.__TAURI__.dialog.message) {
+              await window.__TAURI__.dialog.message(errMsg, { title: 'Odre 업데이트 오류', kind: 'error' });
+            } else {
+              alert(errMsg);
+            }
             btnCheckUpdate.disabled = false;
             btnCheckUpdate.textContent = t.checkUpdate || '업데이트 확인';
           }
