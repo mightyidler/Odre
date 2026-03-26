@@ -33,7 +33,7 @@ pub struct AppSettings {
     pub watch_folders: Vec<String>,
     pub rules: Vec<FolderRule>,
     pub enabled: bool,
-    pub sort_in_watch: bool,
+    pub sort_external: bool,
     pub dest_folder: Option<String>,
     pub move_delay_secs: u64,
     pub duplicate_action: String, // "number" | "overwrite" | "skip"
@@ -48,7 +48,7 @@ impl Default for AppSettings {
             watch_folders: vec![],
             rules: vec![],
             enabled: false,
-            sort_in_watch: true,
+            sort_external: false,
             dest_folder: None,
             move_delay_secs: 0,
             duplicate_action: "number".into(),
@@ -153,7 +153,7 @@ fn find_rule<'a>(path: &Path, rules: &'a [FolderRule]) -> Option<&'a FolderRule>
 // ─── 파일 이동 ────────────────────────────────────────────────
 
 fn is_file_locked(path: &Path) -> bool {
-    // 🌟 .append(true)를 추가하면 브라우저가 파일을 점유하고 있을 때 더 민감하게 반응합니다. 
+    //  .append(true)를 추가하면 브라우저가 파일을 점유하고 있을 때 더 민감하게 반응합니다. 
     // 하지만 읽기 전용 파일에서 권한 에러가 발생하므로 일반적인 배타적 공유 위반만 검출하기 위해 read(true)로 검사합니다.
     match fs::OpenOptions::new()
         .read(true)
@@ -216,7 +216,7 @@ fn resolve_dest(src: &Path, rule: &FolderRule, settings: &AppSettings) -> PathBu
         }
     }
 
-    if settings.sort_in_watch {
+    if !settings.sort_external {
         base_dir.join(&folder_name)
     } else if let Some(ref dest) = settings.dest_folder {
         PathBuf::from(dest).join(&folder_name)
@@ -308,7 +308,7 @@ fn move_file(
         return false;
     }
 
-    // 🌟 프리징 버그 해결: 무식한 while 20초 대기 루프를 삭제했습니다.
+    //  프리징 버그 해결: 무식한 while 20초 대기 루프를 삭제했습니다.
     // 대신 OS 네이티브 기능(rename)을 사용해 잠겨있지 않을 때만 즉시 이동을 시도합니다.
     let mut success = false;
     
@@ -361,27 +361,44 @@ fn start_watcher(app: AppHandle, state: Arc<OdreState>) {
             )
             .expect("watcher 생성 실패");
 
+            let mut current_watches: Vec<PathBuf> = Vec::new();
+
             {
                 let settings = state.settings.lock().unwrap();
                 for folder in &settings.watch_folders {
                     let p = PathBuf::from(folder);
-                    if p.exists() {
-                        let _ = watcher.watch(&p, RecursiveMode::NonRecursive);
+                    if p.exists() && watcher.watch(&p, RecursiveMode::NonRecursive).is_ok() {
+                        current_watches.push(p.clone());
                         log::info!("모니터링 시작: {:?}", p);
                     }
                 }
             }
 
-            let app_clone = app.clone();
-            let state_clone = state.clone();
+            let (reload_tx, mut reload_rx) = mpsc::channel::<()>(16);
+
             app.listen("watch-folders-changed", move |_| {
-                log::info!("모니터링 폴더 변경됨 — 재시작 필요");
-                let _ = app_clone.emit("restart-required", ());
-                drop(state_clone.settings.lock());
+                log::info!("모니터링 설정 변경 — 감시 디렉토리 동적 갱신");
+                // 백그라운드 스레드에서 차단되는 것을 피하기 위해 try_send 사용
+                let _ = reload_tx.try_send(());
             });
 
             loop {
                 tokio::select! {
+                    Some(_) = reload_rx.recv() => {
+                        for p in &current_watches {
+                            let _ = watcher.unwatch(p);
+                        }
+                        current_watches.clear();
+                        
+                        let settings = state.settings.lock().unwrap();
+                        for folder in &settings.watch_folders {
+                            let p = PathBuf::from(folder);
+                            if p.exists() && watcher.watch(&p, RecursiveMode::NonRecursive).is_ok() {
+                                current_watches.push(p.clone());
+                                log::info!("모니터링 시작(갱신): {:?}", p);
+                            }
+                        }
+                    }
                     Some(res) = rx.recv() => {
                         match res {
                             Ok(event) => {
@@ -491,8 +508,14 @@ async fn process_pending(app: &AppHandle, state: &Arc<OdreState>) {
             continue;
         }
         if let Some(rule) = find_rule(&path, &settings.rules) {
-            let rule = rule.clone();
-            move_file(app, path, &rule, &settings, state);
+            let rule_clone = rule.clone();
+            let app_clone = app.clone();
+            let state_clone = Arc::clone(state);
+            let settings_clone = settings.clone();
+
+            tokio::task::spawn_blocking(move || {
+                move_file(&app_clone, path, &rule_clone, &settings_clone, &state_clone);
+            });
         }
     }
 }
@@ -577,15 +600,31 @@ fn organize_now(app: AppHandle, state: State<Arc<OdreState>>) -> Result<u32, Str
     let mut count = 0u32;
     let mut empty_dirs_to_check = Vec::new();
 
-    for folder in &settings.watch_folders {
-        let dir = PathBuf::from(folder);
+    // 스캔할 디렉토리 목록: 모니터링 폴더 + (sort_external=true일 때) dest_folder
+    let mut scan_dirs: Vec<PathBuf> = settings
+        .watch_folders
+        .iter()
+        .map(PathBuf::from)
+        .collect();
+
+    if settings.sort_external {
+        if let Some(ref dest) = settings.dest_folder {
+            let dest_path = PathBuf::from(dest);
+            // 중복 방지: watch_folders에 이미 포함된 경우 추가하지 않음
+            if !scan_dirs.iter().any(|d| d == &dest_path) {
+                scan_dirs.push(dest_path);
+            }
+        }
+    }
+
+    for dir in &scan_dirs {
         if !dir.exists() {
             continue;
         }
         
         let mut files_to_process = Vec::new();
 
-        if let Ok(entries) = fs::read_dir(&dir) {
+        if let Ok(entries) = fs::read_dir(dir) {
             for entry in entries.flatten() {
                 let path = entry.path();
                 if path.is_file() {
@@ -593,11 +632,7 @@ fn organize_now(app: AppHandle, state: State<Arc<OdreState>>) -> Result<u32, Str
                 } else if path.is_dir() {
                     // 하위 Odre 폴더 탐색
                     if let Some(name) = path.file_name().and_then(|n| n.to_str()) {
-                        if name.len() >= 4 
-                            && name.as_bytes()[0].is_ascii_digit() 
-                            && name.as_bytes()[1].is_ascii_digit() 
-                            && name[2..].starts_with(". ") 
-                        {
+                        if is_odre_folder_name(name) {
                             empty_dirs_to_check.push(path.clone());
                             if let Ok(sub_entries) = fs::read_dir(&path) {
                                 for sub_entry in sub_entries.flatten() {
@@ -987,4 +1022,43 @@ pub fn run() {
         ])
         .run(tauri::generate_context!())
         .expect("Tauri 앱 실행 실패");
+}#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::path::PathBuf;
+
+    #[test]
+    fn test_is_odre_folder_name() {
+        assert!(is_odre_folder_name("01. Video"));
+        assert!(is_odre_folder_name("99. Document"));
+        assert!(!is_odre_folder_name("01 Video"));
+        assert!(!is_odre_folder_name("Video"));
+    }
+
+    #[test]
+    fn test_resolve_dest_internal() {
+        let rule = FolderRule { id: 1, name: "Video".into(), exts: vec![], patterns: vec![] };
+        let mut settings = AppSettings::default();
+        settings.sort_external = false; // Internal sorting
+        
+        let src = PathBuf::from("C:\\Watch\\movie.mp4");
+        // We set rules to resolve get_folder_name
+        settings.rules.push(rule.clone());
+
+        let dest = resolve_dest(&src, &rule, &settings);
+        assert_eq!(dest.to_str().unwrap(), "C:\\Watch\\01. Video");
+    }
+
+    #[test]
+    fn test_resolve_dest_external() {
+        let rule = FolderRule { id: 1, name: "Video".into(), exts: vec![], patterns: vec![] };
+        let mut settings = AppSettings::default();
+        settings.sort_external = true; 
+        settings.dest_folder = Some("D:\\Sorted".into());
+        settings.rules.push(rule.clone());
+
+        let src = PathBuf::from("C:\\Watch\\movie.mp4");
+        let dest = resolve_dest(&src, &rule, &settings);
+        assert_eq!(dest.to_str().unwrap(), "D:\\Sorted\\01. Video");
+    }
 }

@@ -57,7 +57,7 @@ function updateThemeUI() {
 
 // 윈도우 OS 테마 변경 감지
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', async (e) => {
-  // 🌟 핵심 수정: 사용자가 직접 테마를 고정(dark/light)했다면 OS 변경을 무시합니다.
+  //  핵심 수정: 사용자가 직접 테마를 고정(dark/light)했다면 OS 변경을 무시합니다.
   if (currentThemeMode === 'system') {
     isDark = e.matches;
     updateThemeUI();
@@ -158,8 +158,8 @@ const i18n = {
     autoClean: '자동 정리', autoCleanDesc: '백그라운드에서 실시간으로 모니터링하며 폴더의 질서를 유지합니다.',
     cleanNow: '지금 정리하기', unpackManaged: '관리 폴더 해체', unpackAll: '모든 폴더 해체',
     watchFolder: '모니터링 폴더', addFolder: '폴더 추가',
-    saveLocation: '저장 위치', sortInWatch: '모니터링 폴더 내 분류',
-    sortInWatchDesc: '비활성화 시 모든 파일을 지정된 다른 폴더로 이동하여 분류합니다.',
+    saveLocation: '저장 위치', sortExternal: '외부 폴더 분류',
+    sortExternalDesc: '활성화 시 모든 파일을 지정된 다른 폴더로 이동하여 분류합니다.',
     unset: '미설정', select: '선택',
     actionSettings: '동작 설정', moveDelay: '이동 지연', duplicate: '중복 파일',
     autoRun: 'Windows 시작 시 자동 실행', autoRunDesc: '시스템 시작 시 자동으로 실행되어 실시간 정리를 시작합니다.',
@@ -188,8 +188,8 @@ const i18n = {
     autoClean: 'Auto-Organize', autoCleanDesc: 'Runs in the background and keeps your folders tidy in real time.',
     cleanNow: 'Organize Now', unpackManaged: 'Unpack Sorted', unpackAll: 'Unpack All',
     watchFolder: 'Monitored Folders', addFolder: 'Add Folder',
-    saveLocation: 'Save Location', sortInWatch: 'Sort into Monitored Folder',
-    sortInWatchDesc: 'When off, all files are moved to a separate designated folder.',
+    saveLocation: 'Save Location', sortExternal: 'Sort to External Folder',
+    sortExternalDesc: 'When on, all files are sorted into a separate designated folder.',
     unset: 'Not Set', select: 'Select',
     actionSettings: 'Behavior', moveDelay: 'Move Delay', duplicate: 'Duplicates',
     autoRun: 'Launch at Windows Startup', autoRunDesc: 'Starts automatically at login and begins organizing right away.',
@@ -218,8 +218,8 @@ const i18n = {
     autoClean: '自动整理', autoCleanDesc: '在后台实时运行，自动保持文件夹井然有序。',
     cleanNow: '立即整理', unpackManaged: '解除管理', unpackAll: '全部解除',
     watchFolder: '管理文件夹', addFolder: '添加文件夹',
-    saveLocation: '保存位置', sortInWatch: '在管理文件夹内整理',
-    sortInWatchDesc: '关闭后，所有文件将移动到指定的其他文件夹进行整理。',
+    saveLocation: '保存位置', sortExternal: '外部文件夹整理',
+    sortExternalDesc: '开启后，所有文件将移动到指定的其他文件夹进行整理。',
     unset: '未设置', select: '选择',
     actionSettings: '操作设置', moveDelay: '移动延迟', duplicate: '重复文件',
     autoRun: 'Windows 启动时自动运行', autoRunDesc: '系统启动时自动运行，立即开始实时整理。',
@@ -248,8 +248,8 @@ const i18n = {
     autoClean: '自動整理', autoCleanDesc: 'バックグラウンドでリアルタイムに確認して、フォルダを常に整った状態に保ちます。',
     cleanNow: '今すぐ整理', unpackManaged: '管理解除', unpackAll: '全解除',
     watchFolder: '対象フォルダ', addFolder: 'フォルダを追加',
-    saveLocation: '保存先', sortInWatch: '対象フォルダ内で整理',
-    sortInWatchDesc: 'オフにすると、すべてのファイルを別の指定フォルダへ移動して整理します。',
+    saveLocation: '保存先', sortExternal: '外部フォルダへ整理',
+    sortExternalDesc: 'オンにすると、すべてのファイルを別の指定フォルダへ移動して整理します。',
     unset: '未設定', select: '選択',
     actionSettings: '動作設定', moveDelay: '移動の遅延', duplicate: '重複ファイル',
     autoRun: 'Windows起動時に自動実行', autoRunDesc: 'ログイン時に自動で起動し、リアルタイム整理をすぐに開始します。',
@@ -278,8 +278,8 @@ const i18n = {
     autoClean: 'Organisation auto', autoCleanDesc: 'Surveille en arrière-plan et maintient vos dossiers organisés en temps réel.',
     cleanNow: 'Organiser', unpackManaged: 'Défaire triés', unpackAll: 'Tout défaire',
     watchFolder: 'Dossiers gérés', addFolder: 'Ajouter un dossier',
-    saveLocation: 'Emplacement', sortInWatch: 'Trier dans le dossier géré',
-    sortInWatchDesc: 'Si désactivé, tous les fichiers sont déplacés vers un dossier désigné.',
+    saveLocation: 'Emplacement', sortExternal: 'Trier vers un dossier externe',
+    sortExternalDesc: 'Si activé, tous les fichiers sont déplacés vers un dossier désigné.',
     unset: 'Non défini', select: 'Choisir',
     actionSettings: 'Comportement', moveDelay: 'Délai de déplacement', duplicate: 'Doublons',
     autoRun: 'Démarrer avec Windows', autoRunDesc: 'Démarre automatiquement à la connexion et commence l\'organisation immédiatement.',
@@ -308,8 +308,8 @@ const i18n = {
     autoClean: 'Organización auto', autoCleanDesc: 'Supervisa en segundo plano y mantiene tus carpetas ordenadas en tiempo real.',
     cleanNow: 'Organizar', unpackManaged: 'Deshacer orden', unpackAll: 'Deshacer todo',
     watchFolder: 'Carpetas administradas', addFolder: 'Añadir carpeta',
-    saveLocation: 'Destino', sortInWatch: 'Organizar dentro de la carpeta administrada',
-    sortInWatchDesc: 'Si está desactivado, todos los archivos se mueven a una carpeta designada.',
+    saveLocation: 'Destino', sortExternal: 'Organizar en carpeta externa',
+    sortExternalDesc: 'Si está activado, todos los archivos se mueven a una carpeta designada.',
     unset: 'No definido', select: 'Seleccionar',
     actionSettings: 'Comportamiento', moveDelay: 'Retraso de movimiento', duplicate: 'Duplicados',
     autoRun: 'Iniciar con Windows', autoRunDesc: 'Se inicia automáticamente al arrancar y comienza a organizar de inmediato.',
@@ -399,7 +399,7 @@ function applyLang(lang) {
 }
 
 document.querySelectorAll('.dropdown-item').forEach(item => {
-  item.addEventListener('click', async () => { // 👈 여기 async 추가!
+  item.addEventListener('click', async () => { //  여기 async 추가!
     const dd = item.dataset.dd;
     document.getElementById(dd + '-menu').querySelectorAll('.dropdown-item').forEach(i => i.classList.remove('is-selected'));
     item.classList.add('is-selected');
@@ -441,7 +441,7 @@ document.querySelectorAll('.dropdown-item').forEach(item => {
 });
 
 document.getElementById('sortToggle').addEventListener('change', function () {
-  document.getElementById('destWrap').classList.toggle('is-hidden', this.checked);
+  document.getElementById('destWrap').classList.toggle('is-hidden', !this.checked);
 });
 
 const defaultRules = [
@@ -677,7 +677,7 @@ function initDrag() {
   let isChecking = false;
 
   function onDown(e) {
-    // 🌟 드래그 핸들뿐만 아니라 규칙 아이템 전체를 잡아 끌 수 있게 허용하되,
+    //  드래그 핸들뿐만 아니라 규칙 아이템 전체를 잡아 끌 수 있게 허용하되,
     // 입력창, 스위치, 삭제 버튼 등 실제 클릭해야 하는 인터랙트 요소들은 드래그에서 제외합니다.
     if (e.target.closest('input, button, .ext-tag__remove, .switch-btn, .input-type-switch')) {
       return;
@@ -966,7 +966,7 @@ const tauriBridge = (() => {
       watchFolders: watchFolders,
       rules: rules,
       enabled: document.querySelector('#panel-general .toggle input')?.checked ?? true,
-      sortInWatch: document.getElementById('sortToggle')?.checked ?? true,
+      sortExternal: document.getElementById('sortToggle')?.checked ?? false,
       destFolder: destFolder || null,
       moveDelaySecs: parsedDelay,
       duplicateAction: parsedDup,
@@ -1003,8 +1003,8 @@ const tauriBridge = (() => {
 
     const sortToggle = document.getElementById('sortToggle');
     if (sortToggle) {
-      sortToggle.checked = s.sortInWatch ?? true;
-      document.getElementById('destWrap').classList.toggle('is-hidden', sortToggle.checked);
+      sortToggle.checked = s.sortExternal ?? false;
+      document.getElementById('destWrap').classList.toggle('is-hidden', !sortToggle.checked);
     }
     if (s.destFolder) {
       destFolder = s.destFolder;
@@ -1082,7 +1082,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   await tauriBridge.loadSettings();  // 테마 및 세팅 완벽하게 로드
   renderWatchFolders();
 
-  // 🌟 모든 세팅과 색상이 입혀진 뒤에 비로소 창을 짠! 하고 띄웁니다.
+  //  모든 세팅과 색상이 입혀진 뒤에 비로소 창을 짠! 하고 띄웁니다.
   await tauriBridge.invoke('show_main_window');
 });
 
@@ -1146,6 +1146,16 @@ document.querySelector('.add-folder-btn')?.addEventListener('click', async () =>
     watchFolders.push(selected);
     renderWatchFolders();
     await tauriBridge.saveSettings({ watchFolders });
+    
+    // 자동 정리 활성화 시 추가 직후 즉시 정리 실행
+    const autoCleanToggle = document.querySelector('#panel-general .toggle input');
+    if (autoCleanToggle && autoCleanToggle.checked) {
+      const count = await tauriBridge.invoke('organize_now');
+      if (count !== null && count > 0) {
+        const t = i18n[currentLang] || i18n['한국어'];
+        showToast(`${count}${t.organizeDone}`, 3000);
+      }
+    }
   }
 });
 
@@ -1161,7 +1171,7 @@ document.querySelector('#destWrap .select-btn')?.addEventListener('click', async
     }
     await tauriBridge.saveSettings({ destFolder });
     const sortToggle = document.getElementById('sortToggle');
-    if (sortToggle && !sortToggle.checked) {
+    if (sortToggle && sortToggle.checked) {
       await tauriBridge.invoke('migrate_sorted_folders', { toDest: true });
     }
   }
@@ -1211,9 +1221,9 @@ document.querySelector('#panel-general .toggle input')?.addEventListener('change
 
 document.querySelector('[data-i18n="autoRun"]')?.closest('.card-row')?.querySelector('input')?.addEventListener('change', async function () { await tauriBridge.saveSettings({ autostart: this.checked }); });
 document.getElementById('sortToggle')?.addEventListener('change', async function () {
-  document.getElementById('destWrap').classList.toggle('is-hidden', this.checked);
-  await tauriBridge.saveSettings({ sortInWatch: this.checked });
-  if (this.checked) {
+  document.getElementById('destWrap').classList.toggle('is-hidden', !this.checked);
+  await tauriBridge.saveSettings({ sortExternal: this.checked });
+  if (!this.checked) {
     await tauriBridge.invoke('migrate_sorted_folders', { toDest: false });
   } else if (destFolder) {
     await tauriBridge.invoke('migrate_sorted_folders', { toDest: true });
