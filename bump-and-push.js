@@ -37,15 +37,21 @@ if (fs.existsSync(cargoPath)) {
 
 // 4. Git 커밋 및 태그 생성, 푸시
 try {
-  run('git add package.json src-tauri/tauri.conf.json src-tauri/Cargo.toml');
-  
   // 혹시 모를 로컬 변경사항 저장 및 원격 동기화
   run('git stash');
   run('git pull origin main --rebase');
   run('git stash pop || echo "No stash to pop"');
 
-  run(`git commit -m "chore: bump version to v${newVersion}"`);
-  run(`git tag v${newVersion}`);
+  run('git add -A');
+  
+  // 변경사항이 있을 때만 커밋하도록 오류 무시처리
+  try {
+    execSync(`git commit -m "chore: bump version to v${newVersion}"`, { stdio: 'inherit' });
+  } catch(e) {
+    console.log("No changes to commit, proceeding to tag and push...");
+  }
+  
+  run(`git tag v${newVersion} || echo "Tag already exists"`);
   
   console.log('\n🚀 GitHub으로 푸시 중 (이 작업이 완료되면 GitHub Actions에서 클라우드 빌드가 시작됩니다!)...');
   run('git push origin main');

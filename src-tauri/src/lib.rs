@@ -235,13 +235,27 @@ fn unique_dest_path(dest_dir: &Path, filename: &str, action: &str) -> PathBuf {
         "skip" => dest,
         _ => {
             let path = Path::new(filename);
-            let stem = path.file_stem().and_then(|s| s.to_str()).unwrap_or(filename);
+            let raw_stem = path.file_stem().and_then(|s| s.to_str()).unwrap_or(filename);
             let ext = path.extension().and_then(|e| e.to_str());
+
+            // 기존 (N) 접미사를 모두 제거하여 photo(1)(2) → photo 로 정규화
+            let mut base = raw_stem.to_string();
+            while base.ends_with(')') {
+                if let Some(open) = base.rfind('(') {
+                    let inside = &base[open + 1..base.len() - 1];
+                    if inside.chars().all(|c| c.is_ascii_digit()) && !inside.is_empty() {
+                        base.truncate(open);
+                        continue;
+                    }
+                }
+                break;
+            }
+
             let mut n = 1u32;
             loop {
                 let new_name = match ext {
-                    Some(e) => format!("{}({}){}.{}", stem, n, "", e),
-                    None => format!("{}({})", stem, n),
+                    Some(e) => format!("{}({}).{}", base, n, e),
+                    None => format!("{}({})", base, n),
                 };
                 let candidate = dest_dir.join(&new_name);
                 if !candidate.exists() {
@@ -259,7 +273,7 @@ fn move_file(
     rule: &FolderRule,
     settings: &AppSettings,
     state: &OdreState,
-) {
+) -> bool {
     let dest_dir = resolve_dest(&src, rule, settings);
     let folder_name = get_folder_name(rule, settings);
 
@@ -269,19 +283,19 @@ fn move_file(
         .unwrap_or("unknown");
 
     if src == dest_dir.join(filename) {
-        return;
+        return false;
     }
 
     if let Err(e) = fs::create_dir_all(&dest_dir) {
         log::error!("dest dir 생성 실패: {}", e);
-        return;
+        return false;
     }
 
     if settings.duplicate_action == "skip" {
         let candidate = dest_dir.join(filename);
         if candidate.exists() {
             log::info!("skip (중복): {:?}", src);
-            return;
+            return false;
         }
     }
 
@@ -291,7 +305,7 @@ fn move_file(
     // 다운로드가 완료되면 OS가 발생시키는 이벤트로 인해 다시 호출됩니다.
     if is_file_locked(&src) {
         log::warn!("파일이 사용 중(다운로드 중 등)입니다. 나중에 처리합니다: {:?}", src);
-        return;
+        return false;
     }
 
     // 🌟 프리징 버그 해결: 무식한 while 20초 대기 루프를 삭제했습니다.
@@ -326,9 +340,9 @@ fn move_file(
         };
         state.history.lock().unwrap().push(record.clone());
     } else {
-        // 파일이 다운로드 중이라 락이 걸려있다면 미련 없이 건너뜁니다. (앱 멈춤 방지)
         log::warn!("파일이 사용 중이라 이번 턴은 건너뜁니다: {:?}", src);
     }
+    success
 }
 
 // ─── 파일 모니터링 루프 ───────────────────────────────────────────
@@ -601,8 +615,9 @@ fn organize_now(app: AppHandle, state: State<Arc<OdreState>>) -> Result<u32, Str
         for path in files_to_process {
             if let Some(rule) = find_rule(&path, &settings.rules) {
                 let rule = rule.clone();
-                move_file(&app, path, &rule, &settings, &state);
-                count += 1;
+                if move_file(&app, path, &rule, &settings, &state) {
+                    count += 1;
+                }
             }
         }
     }
@@ -615,10 +630,10 @@ fn organize_now(app: AppHandle, state: State<Arc<OdreState>>) -> Result<u32, Str
     Ok(count)
 }
 
-// 폴더 해체 기능 구현
+// 관리 폴더(01. 접두사) 해체 기능
 #[tauri::command]
-fn dissolve_folders(app: AppHandle, state: State<Arc<OdreState>>) -> Result<u32, String> {
-    // 1. 버그 픽스: 파일 해체를 시작하기 전에 모니터링자(Watcher)부터 끕니다!
+fn unpack_managed(app: AppHandle, state: State<Arc<OdreState>>) -> Result<u32, String> {
+    // 파일 해체를 시작하기 전에 모니터링자(Watcher)부터 끕니다!
     let mut settings = state.settings.lock().unwrap().clone();
     settings.enabled = false;
     *state.settings.lock().unwrap() = settings.clone();
@@ -642,15 +657,13 @@ fn dissolve_folders(app: AppHandle, state: State<Arc<OdreState>>) -> Result<u32,
                 if path.is_dir() {
                     // "01. XXX" 형태의 Odre 폴더인지 확인
                     if let Some(name) = path.file_name().and_then(|n| n.to_str()) {
-                        if name.len() >= 4 && name.as_bytes()[0].is_ascii_digit() && name.as_bytes()[1].is_ascii_digit() && name[2..].starts_with(". ") {
-                            
+                        if is_odre_folder_name(name) {
                             // 폴더 안의 모든 파일(숨김 포함)을 위로 꺼냄
                             if let Ok(sub_entries) = fs::read_dir(&path) {
                                 for sub_entry in sub_entries.flatten() {
                                     if sub_entry.path().is_file() {
                                         if let Some(filename) = sub_entry.path().file_name().and_then(|n| n.to_str()) {
                                             let dest = unique_dest_path(&base_dir, filename, &settings.duplicate_action);
-                                            // safe_move_file을 사용하여 유실 0% 보장
                                             if safe_move_file(&sub_entry.path(), &dest).is_ok() {
                                                 count += 1;
                                             }
@@ -658,12 +671,112 @@ fn dissolve_folders(app: AppHandle, state: State<Arc<OdreState>>) -> Result<u32,
                                     }
                                 }
                             }
-                            // 안의 파일들을 모두 꺼냈으므로 빈 껍데기 폴더 삭제 시도
+                            // 빈 껍데기 폴더 삭제 시도
                             let _ = fs::remove_dir(&path); 
                         }
                     }
                 }
             }
+        }
+    }
+
+    Ok(count)
+}
+
+// Smart Ignore: 시스템/설정 폴더 보호 목록
+const SMART_IGNORE_DIRS: &[&str] = &[
+    ".git", ".svn", ".hg",
+    "node_modules", ".vscode", ".idea",
+    "target", "build", "dist", "out",
+    "__pycache__", ".cache", ".npm",
+    "$RECYCLE.BIN", "System Volume Information",
+    ".Trash", ".DS_Store",
+];
+
+fn is_smart_ignored(name: &str) -> bool {
+    SMART_IGNORE_DIRS.iter().any(|&ignored| name.eq_ignore_ascii_case(ignored))
+}
+
+/// 폴더 내 모든 파일을 base_dir로 재귀적으로 꺼냄 (Smart Ignore 적용)
+fn unpack_dir_recursive(
+    dir: &Path,
+    base_dir: &Path,
+    dup_action: &str,
+    count: &mut u32,
+) {
+    let entries = match fs::read_dir(dir) {
+        Ok(e) => e,
+        Err(_) => return,
+    };
+
+    for entry in entries.flatten() {
+        let path = entry.path();
+        if path.is_file() {
+            if let Some(filename) = path.file_name().and_then(|n| n.to_str()) {
+                let dest = unique_dest_path(base_dir, filename, dup_action);
+                if safe_move_file(&path, &dest).is_ok() {
+                    *count += 1;
+                }
+            }
+        } else if path.is_dir() {
+            if let Some(name) = path.file_name().and_then(|n| n.to_str()) {
+                if is_smart_ignored(name) {
+                    log::info!("Smart Ignore: {:?} 제외됨", path);
+                    continue;
+                }
+                // 재귀적으로 하위 폴더도 해체
+                unpack_dir_recursive(&path, base_dir, dup_action, count);
+            }
+        }
+    }
+
+    // 디렉토리가 비어있으면 삭제 시도 (base_dir 자체는 삭제하지 않음)
+    if dir != base_dir {
+        let _ = fs::remove_dir(dir);
+    }
+}
+
+// 모든 하위 폴더 해체 (Smart Ignore 적용)
+#[tauri::command]
+fn unpack_all(app: AppHandle, state: State<Arc<OdreState>>) -> Result<u32, String> {
+    // 모니터링 비활성화
+    let mut settings = state.settings.lock().unwrap().clone();
+    settings.enabled = false;
+    *state.settings.lock().unwrap() = settings.clone();
+    let _ = save_settings_to_disk(&app, &settings);
+    let _ = app.emit("watch-folders-changed", ());
+
+    let mut count = 0u32;
+
+    let mut base_dirs = settings.watch_folders.iter().map(PathBuf::from).collect::<Vec<_>>();
+    if let Some(dest) = &settings.dest_folder {
+        base_dirs.push(PathBuf::from(dest));
+    }
+
+    for base_dir in base_dirs {
+        if !base_dir.exists() { continue; }
+
+        // 1단계: 스캔할 하위 폴더 목록 수집 (Smart Ignore 적용)
+        let subdirs: Vec<PathBuf> = match fs::read_dir(&base_dir) {
+            Ok(entries) => entries
+                .flatten()
+                .filter_map(|e| {
+                    let p = e.path();
+                    if !p.is_dir() { return None; }
+                    let name = p.file_name()?.to_str()?;
+                    if is_smart_ignored(name) {
+                        log::info!("Smart Ignore: {:?} 제외됨", p);
+                        return None;
+                    }
+                    Some(p)
+                })
+                .collect(),
+            Err(_) => continue,
+        };
+
+        // 2단계: 각 하위 폴더를 재귀적으로 해체
+        for subdir in subdirs {
+            unpack_dir_recursive(&subdir, &base_dir, &settings.duplicate_action, &mut count);
         }
     }
 
@@ -759,7 +872,6 @@ async fn check_for_updates_manual(app: AppHandle) -> Result<String, String> {
                     return Err(format!("업데이트 설치 실패: {}", e));
                 }
                 app.restart();
-                Ok(format!("업데이트 완료: {}", update.version))
             }
             Ok(None) => Ok("LATEST".to_string()),
             Err(e) => Err(e.to_string()),
@@ -861,7 +973,8 @@ pub fn run() {
             get_history,
             clear_history,
             organize_now,
-            dissolve_folders,
+            unpack_managed,
+            unpack_all,
             migrate_sorted_folders,
             reset_settings,
             minimize_window,

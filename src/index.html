@@ -66,9 +66,10 @@
               </label>
             </div>
             <div class="card-divider"></div>
-            <div class="action-row">
+            <div class="action-row action-row--triple">
               <button class="btn btn--blue" data-i18n="cleanNow">지금 정리하기</button>
-              <button class="btn btn--ghost" data-i18n="dissolve">폴더 해체</button>
+              <button class="btn btn--ghost" id="btnUnpackManaged" data-i18n="unpackManaged">관리 폴더 해체</button>
+              <button class="btn btn--ghost btn--warning" id="btnUnpackAll" data-i18n="unpackAll">모든 폴더 해체</button>
             </div>
           </div>
         </div>
@@ -300,6 +301,30 @@
     <span class="changes-bar-label" data-i18n="unsaved">변경사항이 있어요</span>
     <button class="btn-cancel" id="btnCancel" data-i18n="cancel">취소</button>
     <button class="btn-apply" id="btnApply" data-i18n="apply">적용</button>
+  </div>
+
+  <!-- unpack_all 경고 모달 -->
+  <div class="modal-overlay" id="unpackAllModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <span class="modal-title" data-i18n="unpackAllTitle">모든 폴더 해체</span>
+      </div>
+      <div class="modal-body">
+        <p class="modal-text" data-i18n="unpackAllDesc">선택한 경로 내의 모든 하위 폴더를 해체하여 파일들을 현재 위치로 꺼냅니다.</p>
+        <div class="modal-info-block">
+          <span class="modal-info-label" data-i18n="unpackAllIgnoreLabel">Smart Ignore</span>
+          <p class="modal-info-text" data-i18n="unpackAllIgnoreDesc">시스템 보호를 위해 중요 설정 폴더(.git, node_modules, .vscode, target 등)는 자동으로 제외됩니다.</p>
+        </div>
+        <div class="modal-info-block">
+          <span class="modal-info-label" data-i18n="unpackAllSafetyLabel">안전 장치</span>
+          <p class="modal-info-text" data-i18n="unpackAllSafetyDesc">동일한 이름의 파일은 이름 뒤에 숫자를 붙여 보호하며, 해체 후 빈 폴더는 자동 삭제됩니다.</p>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn--ghost" id="modalCancel" data-i18n="cancel">취소</button>
+        <button class="btn btn--red" id="modalConfirm" data-i18n="unpackAllConfirm">모든 폴더 해체</button>
+      </div>
+    </div>
   </div>
 </body>
 

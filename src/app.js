@@ -156,7 +156,7 @@ window.addEventListener('scroll', handleScroll, { passive: true });
 const i18n = {
   '한국어': {
     autoClean: '자동 정리', autoCleanDesc: '백그라운드에서 실시간으로 모니터링하며 폴더의 질서를 유지합니다.',
-    cleanNow: '지금 정리하기', dissolve: '폴더 해체',
+    cleanNow: '지금 정리하기', unpackManaged: '관리 폴더 해체', unpackAll: '모든 폴더 해체',
     watchFolder: '모니터링 폴더', addFolder: '폴더 추가',
     saveLocation: '저장 위치', sortInWatch: '모니터링 폴더 내 분류',
     sortInWatchDesc: '비활성화 시 모든 파일을 지정된 다른 폴더로 이동하여 분류합니다.',
@@ -177,10 +177,16 @@ const i18n = {
     theme: '테마', theme_system: '시스템 설정', theme_dark: '다크 모드', theme_light: '라이트 모드',
     updateSection: '업데이트', currentVersion: '현재 버전', checkUpdate: '업데이트 확인',
     checking: '확인 중...', latestVersion: '최신 버전입니다', updateFound: '업데이트 발견', updateFailed: '확인 실패',
+    unpackAllTitle: '모든 폴더 해체', unpackAllDesc: '선택한 경로 내의 모든 하위 폴더를 해체하여 파일들을 현재 위치로 꺼냅니다.',
+    unpackAllIgnoreLabel: 'Smart Ignore', unpackAllIgnoreDesc: '시스템 보호를 위해 중요 설정 폴더(.git, node_modules, .vscode, target 등)는 자동으로 제외됩니다.',
+    unpackAllSafetyLabel: '안전 장치', unpackAllSafetyDesc: '동일한 이름의 파일은 이름 뒤에 숫자를 붙여 보호하며, 해체 후 빈 폴더는 자동 삭제됩니다.',
+    unpackAllConfirm: '모든 폴더 해체',
+    unpackManagedDone: '개의 파일이 복구되었습니다.', unpackAllDone: '개의 파일이 해체되었습니다.',
+    organizeDone: '개의 파일이 정리되었습니다.',
   },
   'English': {
     autoClean: 'Auto-Organize', autoCleanDesc: 'Runs in the background and keeps your folders tidy in real time.',
-    cleanNow: 'Organize Now', dissolve: 'Remove',
+    cleanNow: 'Organize Now', unpackManaged: 'Unpack Sorted', unpackAll: 'Unpack All',
     watchFolder: 'Monitored Folders', addFolder: 'Add Folder',
     saveLocation: 'Save Location', sortInWatch: 'Sort into Monitored Folder',
     sortInWatchDesc: 'When off, all files are moved to a separate designated folder.',
@@ -201,10 +207,16 @@ const i18n = {
     theme: 'Theme', theme_system: 'System Default', theme_dark: 'Dark Mode', theme_light: 'Light Mode',
     updateSection: 'Update', currentVersion: 'Current Version', checkUpdate: 'Check for Updates',
     checking: 'Checking...', latestVersion: 'Up to date', updateFound: 'Update found', updateFailed: 'Check failed',
+    unpackAllTitle: 'Unpack All Folders', unpackAllDesc: 'Extracts all files from every subfolder and places them in the current location.',
+    unpackAllIgnoreLabel: 'Smart Ignore', unpackAllIgnoreDesc: 'Critical system folders (.git, node_modules, .vscode, target, etc.) are automatically excluded for protection.',
+    unpackAllSafetyLabel: 'Safety Net', unpackAllSafetyDesc: 'Files with duplicate names are preserved with a number suffix. Empty folders are automatically removed after unpacking.',
+    unpackAllConfirm: 'Unpack All Folders',
+    unpackManagedDone: ' files have been restored.', unpackAllDone: ' files have been unpacked.',
+    organizeDone: ' files have been organized.',
   },
   '中文': {
     autoClean: '自动整理', autoCleanDesc: '在后台实时运行，自动保持文件夹井然有序。',
-    cleanNow: '立即整理', dissolve: '取消管理',
+    cleanNow: '立即整理', unpackManaged: '解除管理', unpackAll: '全部解除',
     watchFolder: '管理文件夹', addFolder: '添加文件夹',
     saveLocation: '保存位置', sortInWatch: '在管理文件夹内整理',
     sortInWatchDesc: '关闭后，所有文件将移动到指定的其他文件夹进行整理。',
@@ -225,10 +237,16 @@ const i18n = {
     theme: '主题', theme_system: '系统设置', theme_dark: '深色模式', theme_light: '浅色模式',
     updateSection: '更新', currentVersion: '当前版本', checkUpdate: '检查更新',
     checking: '检查中...', latestVersion: '已是最新版本', updateFound: '发现更新', updateFailed: '检查失败',
+    unpackAllTitle: '解包所有文件夹', unpackAllDesc: '将选定路径中所有子文件夹的文件提取到当前位置。',
+    unpackAllIgnoreLabel: 'Smart Ignore', unpackAllIgnoreDesc: '为保护系统，重要配置文件夹（.git、node_modules、.vscode、target 等）将自动排除。',
+    unpackAllSafetyLabel: '安全保障', unpackAllSafetyDesc: '同名文件将添加编号以防止覆盖，解包后空文件夹将自动删除。',
+    unpackAllConfirm: '解包所有文件夹',
+    unpackManagedDone: '个文件已恢复。', unpackAllDone: '个文件已解包。',
+    organizeDone: '个文件已整理。',
   },
   '日本語': {
     autoClean: '自動整理', autoCleanDesc: 'バックグラウンドでリアルタイムに確認して、フォルダを常に整った状態に保ちます。',
-    cleanNow: '今すぐ整理', dissolve: '管理を解除',
+    cleanNow: '今すぐ整理', unpackManaged: '管理解除', unpackAll: '全解除',
     watchFolder: '対象フォルダ', addFolder: 'フォルダを追加',
     saveLocation: '保存先', sortInWatch: '対象フォルダ内で整理',
     sortInWatchDesc: 'オフにすると、すべてのファイルを別の指定フォルダへ移動して整理します。',
@@ -249,10 +267,16 @@ const i18n = {
     theme: 'テーマ', theme_system: 'システム設定', theme_dark: 'ダークモード', theme_light: 'ライトモード',
     updateSection: 'アップデート', currentVersion: '現在のバージョン', checkUpdate: 'アップデート確認',
     checking: '確認中...', latestVersion: '最新バージョンです', updateFound: 'アップデートあり', updateFailed: '確認失敗',
+    unpackAllTitle: 'すべてのフォルダを解除', unpackAllDesc: '選択したパス内のすべてのサブフォルダを解体し、ファイルを現在の位置に取り出します。',
+    unpackAllIgnoreLabel: 'Smart Ignore', unpackAllIgnoreDesc: 'システム保護のため、重要な設定フォルダ（.git、node_modules、.vscode、target など）は自動的に除外されます。',
+    unpackAllSafetyLabel: '安全装置', unpackAllSafetyDesc: '同名ファイルは番号付きで保護され、解除後の空フォルダは自動削除されます。',
+    unpackAllConfirm: 'すべてのフォルダ解除',
+    unpackManagedDone: '件のファイルが復元されました。', unpackAllDone: '件のファイルが解除されました。',
+    organizeDone: '件のファイルが整理されました。',
   },
   'Français': {
     autoClean: 'Organisation auto', autoCleanDesc: 'Surveille en arrière-plan et maintient vos dossiers organisés en temps réel.',
-    cleanNow: 'Organiser maintenant', dissolve: 'Supprimer',
+    cleanNow: 'Organiser', unpackManaged: 'Défaire triés', unpackAll: 'Tout défaire',
     watchFolder: 'Dossiers gérés', addFolder: 'Ajouter un dossier',
     saveLocation: 'Emplacement', sortInWatch: 'Trier dans le dossier géré',
     sortInWatchDesc: 'Si désactivé, tous les fichiers sont déplacés vers un dossier désigné.',
@@ -273,10 +297,16 @@ const i18n = {
     theme: 'Thème', theme_system: 'Système', theme_dark: 'Mode sombre', theme_light: 'Mode clair',
     updateSection: 'Mise à jour', currentVersion: 'Version actuelle', checkUpdate: 'Vérifier',
     checking: 'Vérification...', latestVersion: 'À jour', updateFound: 'Mise à jour disponible', updateFailed: 'Échec',
+    unpackAllTitle: 'Défaire tous les dossiers', unpackAllDesc: 'Extrait tous les fichiers de chaque sous-dossier et les place à l\'emplacement actuel.',
+    unpackAllIgnoreLabel: 'Smart Ignore', unpackAllIgnoreDesc: 'Les dossiers système critiques (.git, node_modules, .vscode, target, etc.) sont automatiquement exclus.',
+    unpackAllSafetyLabel: 'Filet de sécurité', unpackAllSafetyDesc: 'Les fichiers en double sont préservés avec un suffixe numérique. Les dossiers vides sont automatiquement supprimés.',
+    unpackAllConfirm: 'Défaire tous les dossiers',
+    unpackManagedDone: ' fichiers ont été restaurés.', unpackAllDone: ' fichiers ont été extraits.',
+    organizeDone: ' fichiers ont été organisés.',
   },
   'Español': {
     autoClean: 'Organización auto', autoCleanDesc: 'Supervisa en segundo plano y mantiene tus carpetas ordenadas en tiempo real.',
-    cleanNow: 'Organizar ahora', dissolve: 'Eliminar',
+    cleanNow: 'Organizar', unpackManaged: 'Deshacer orden', unpackAll: 'Deshacer todo',
     watchFolder: 'Carpetas administradas', addFolder: 'Añadir carpeta',
     saveLocation: 'Destino', sortInWatch: 'Organizar dentro de la carpeta administrada',
     sortInWatchDesc: 'Si está desactivado, todos los archivos se mueven a una carpeta designada.',
@@ -297,6 +327,12 @@ const i18n = {
     theme: 'Tema', theme_system: 'Sistema', theme_dark: 'Modo oscuro', theme_light: 'Modo claro',
     updateSection: 'Actualización', currentVersion: 'Versión actual', checkUpdate: 'Buscar actualizaciones',
     checking: 'Verificando...', latestVersion: 'Actualizado', updateFound: 'Actualización disponible', updateFailed: 'Error',
+    unpackAllTitle: 'Deshacer todas las carpetas', unpackAllDesc: 'Extrae todos los archivos de cada subcarpeta y los coloca en la ubicación actual.',
+    unpackAllIgnoreLabel: 'Smart Ignore', unpackAllIgnoreDesc: 'Las carpetas críticas del sistema (.git, node_modules, .vscode, target, etc.) se excluyen automáticamente.',
+    unpackAllSafetyLabel: 'Red de seguridad', unpackAllSafetyDesc: 'Los archivos duplicados se conservan con un sufijo numérico. Las carpetas vacías se eliminan automáticamente.',
+    unpackAllConfirm: 'Deshacer todas las carpetas',
+    unpackManagedDone: ' archivos han sido restaurados.', unpackAllDone: ' archivos han sido extraídos.',
+    organizeDone: ' archivos han sido organizados.',
   }
 };
 
@@ -1088,24 +1124,24 @@ function renderWatchFolders() {
     card.insertBefore(div, addBtn);
   }
 
-  const dissolveBtn = document.querySelector('[data-i18n="dissolve"]');
-  if (dissolveBtn) {
+  // unpackManaged, unpackAll 버튼 상태 관리
+  const unpackBtns = [document.getElementById('btnUnpackManaged'), document.getElementById('btnUnpackAll')];
+  unpackBtns.forEach(btn => {
+    if (!btn) return;
     if (watchFolders.length === 0) {
-      dissolveBtn.disabled = true;
-      dissolveBtn.style.opacity = '0.5';
-      dissolveBtn.style.cursor = 'not-allowed';
+      btn.disabled = true;
+      btn.style.opacity = '0.5';
+      btn.style.cursor = 'not-allowed';
     } else {
-      dissolveBtn.disabled = false;
-      dissolveBtn.style.opacity = '1';
-      dissolveBtn.style.cursor = 'pointer';
+      btn.disabled = false;
+      btn.style.opacity = '1';
+      btn.style.cursor = 'pointer';
     }
-  }
+  });
 }
 
 document.querySelector('.add-folder-btn')?.addEventListener('click', async () => {
-  // 원래 만들어두었던 Rust 백엔드의 안전한 폴더 선택기 호출
   const selected = await tauriBridge.invoke('select_folder');
-
   if (selected && !watchFolders.includes(selected)) {
     watchFolders.push(selected);
     renderWatchFolders();
@@ -1114,9 +1150,7 @@ document.querySelector('.add-folder-btn')?.addEventListener('click', async () =>
 });
 
 document.querySelector('#destWrap .select-btn')?.addEventListener('click', async () => {
-  // 동일하게 Rust 백엔드 폴더 선택기 호출
   const selected = await tauriBridge.invoke('select_folder');
-
   if (selected) {
     destFolder = selected;
     const pathEl = document.querySelector('#destWrap .folder-path');
@@ -1126,7 +1160,6 @@ document.querySelector('#destWrap .select-btn')?.addEventListener('click', async
       pathEl.removeAttribute('data-i18n');
     }
     await tauriBridge.saveSettings({ destFolder });
-    // sortInWatch가 꺼진 상태에서 대상 폴더를 선택하면 기존 정리 폴더들을 이동
     const sortToggle = document.getElementById('sortToggle');
     if (sortToggle && !sortToggle.checked) {
       await tauriBridge.invoke('migrate_sorted_folders', { toDest: true });
@@ -1145,9 +1178,12 @@ document.querySelector('[data-i18n="cleanNow"]')?.addEventListener('click', asyn
       return;
     }
   }
-  await tauriBridge.saveSettings(); // Ensure any unsaved rules/settings are sent to backend before organization
+  await tauriBridge.saveSettings();
   const count = await tauriBridge.invoke('organize_now');
-  if (count !== null) console.log(`${count}개 파일 정리 완료`);
+  if (count !== null) {
+    const t = i18n[currentLang] || i18n['한국어'];
+    showToast(`${count}${t.organizeDone}`, 3000);
+  }
 });
 
 document.querySelector('#panel-general .toggle input')?.addEventListener('change', async function () {
@@ -1166,7 +1202,10 @@ document.querySelector('#panel-general .toggle input')?.addEventListener('change
   await tauriBridge.saveSettings({ enabled: this.checked });
   if (this.checked) {
     const count = await tauriBridge.invoke('organize_now');
-    if (count > 0) console.log(`${count}개 파일 자동 정리 완료`);
+    if (count !== null && count > 0) {
+      const t = i18n[currentLang] || i18n['한국어'];
+      showToast(`${count}${t.organizeDone}`, 3000);
+    }
   }
 });
 
@@ -1175,10 +1214,8 @@ document.getElementById('sortToggle')?.addEventListener('change', async function
   document.getElementById('destWrap').classList.toggle('is-hidden', this.checked);
   await tauriBridge.saveSettings({ sortInWatch: this.checked });
   if (this.checked) {
-    // 모니터링 폴더 내 분류 활성화: 대상 폴더에서 모니터링 폴더로 복원
     await tauriBridge.invoke('migrate_sorted_folders', { toDest: false });
   } else if (destFolder) {
-    // 모니터링 폴더 내 분류 비활성화 + 대상 폴더 존재: 모니터링 폴더에서 대상 폴더로 이동
     await tauriBridge.invoke('migrate_sorted_folders', { toDest: true });
   }
 });
@@ -1196,14 +1233,78 @@ document.querySelector('[data-i18n="quit"]')?.addEventListener('click', async ()
   await tauriBridge.invoke('exit_app');
 });
 
-// 폴더 해체 버튼 이벤트
-document.querySelector('[data-i18n="dissolve"]')?.addEventListener('click', async () => {
+// ── 관리 해체 (unpack_managed) ──
+function setActionButtonsDisabled(disabled) {
+  const btns = [
+    document.querySelector('[data-i18n="cleanNow"]'),
+    document.getElementById('btnUnpackManaged'),
+    document.getElementById('btnUnpackAll'),
+  ];
+  btns.forEach(b => {
+    if (!b) return;
+    b.disabled = disabled;
+    b.style.opacity = disabled ? '0.5' : '1';
+    b.style.cursor = disabled ? 'not-allowed' : 'pointer';
+  });
+}
+
+document.getElementById('btnUnpackManaged')?.addEventListener('click', async () => {
   if (watchFolders.length === 0) return;
-  if (confirm('모든 정렬된 폴더를 해체하고 파일들을 원래 모니터링 폴더 위치로 되돌리시겠습니까?\n(자동 정리 기능이 비활성화됩니다)')) {
-    const count = await tauriBridge.invoke('dissolve_folders');
+  setActionButtonsDisabled(true);
+  try {
+    const count = await tauriBridge.invoke('unpack_managed');
+    const t = i18n[currentLang] || i18n['한국어'];
     if (count !== null) {
-      alert(`${count}개의 파일이 복구되었습니다.`);
+      showToast(`${count}${t.unpackManagedDone}`, 3000);
       await tauriBridge.loadSettings();
+    }
+  } finally {
+    setActionButtonsDisabled(false);
+    renderWatchFolders();
+  }
+});
+
+// ── 모든 해체 (unpack_all) + 모달 ──
+function openUnpackAllModal() {
+  const modal = document.getElementById('unpackAllModal');
+  if (modal) modal.classList.add('is-open');
+}
+
+function closeUnpackAllModal() {
+  const modal = document.getElementById('unpackAllModal');
+  if (modal) modal.classList.remove('is-open');
+}
+
+document.getElementById('btnUnpackAll')?.addEventListener('click', () => {
+  if (watchFolders.length === 0) return;
+  openUnpackAllModal();
+});
+
+document.getElementById('modalCancel')?.addEventListener('click', closeUnpackAllModal);
+
+document.getElementById('modalConfirm')?.addEventListener('click', async () => {
+  closeUnpackAllModal();
+  setActionButtonsDisabled(true);
+  try {
+    const count = await tauriBridge.invoke('unpack_all');
+    const t = i18n[currentLang] || i18n['한국어'];
+    if (count !== null) {
+      showToast(`${count}${t.unpackAllDone}`, 3000);
+      await tauriBridge.loadSettings();
+    }
+  } finally {
+    setActionButtonsDisabled(false);
+    renderWatchFolders();
+  }
+});
+
+// ESC 키로 모달 닫기
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    const modal = document.getElementById('unpackAllModal');
+    if (modal && modal.classList.contains('is-open')) {
+      e.stopPropagation();
+      closeUnpackAllModal();
     }
   }
 });
